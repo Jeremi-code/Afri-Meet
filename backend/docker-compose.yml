@@ -1,0 +1,43 @@
+
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: pgdata
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+  hasura:
+    image: hasura/graphql-engine:v2.36.4
+    container_name: hasura
+    restart: always
+    ports:
+      - ${HASURA_GRAPHQL_SERVER_PORT}:${HASURA_GRAPHQL_SERVER_PORT}
+    depends_on:
+      - postgres
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: ${HASURA_GRAPHQL_DATABASE_URL}
+      HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+    
+  express:
+    build: 
+      context: .
+      dockerfile: express.Dockerfile
+    container_name: express
+    restart: always
+    ports:
+      - ${EXPRESS_PORT}:${EXPRESS_PORT}
+      - NODE_ENV=${NODE_ENV:-development}
+
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:
