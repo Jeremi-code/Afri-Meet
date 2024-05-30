@@ -15,5 +15,14 @@
   "bugs": {
     "url": "https://github.com/Jeremi-code/Afri-Meet/issues"
   },
-  "homepage": "https://github.com/Jeremi-code/Afri-Meet#readme"
+  "homepage": "https://github.com/Jeremi-code/Afri-Meet#readme",
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.13",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
 }
