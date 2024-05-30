@@ -8,6 +8,8 @@ RUN npm install
 
 COPY ./express/src .express/src
 
+RUN npm run build
+
 FROM node:20.11.1-alpine
 
 WORKDIR /usr/src/app
