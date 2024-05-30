@@ -34,7 +34,6 @@ services:
     restart: always
     ports:
       - ${EXPRESS_PORT}:${EXPRESS_PORT}
-      - NODE_ENV=${NODE_ENV:-development}
 
     depends_on:
       - postgres
