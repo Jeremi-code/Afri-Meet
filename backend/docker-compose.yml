@@ -15,7 +15,7 @@ services:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
 
   hasura:
-    image: hasura/graphql-engine:v2.38.0
+    image: hasura/graphql-engine:v2.36.1
     container_name: hasura
     restart: always
     ports:
