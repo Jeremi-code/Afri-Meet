@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "codegen": "graphql-codegen --watch",
-    "fetch": "gq https://my-graphql-engine.com/v1/graphql -H 'X-Hasura-Admin-Secret: adminsecretkey' --introspect > schema.graphql"
+    "fetch": "get-graphql-schema http://localhost:8080/v1/graphql  > ./gqlGen/schema.graphql"
   },
   "repository": {
     "type": "git",
@@ -27,6 +27,8 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@graphql-codegen/introspection": "^4.0.3",
+    "@graphql-codegen/typescript": "^4.0.7",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "get-graphql-schema": "^2.1.2",
