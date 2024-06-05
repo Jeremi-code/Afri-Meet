@@ -1,0 +1,10 @@
+table:
+  name: student
+  schema: public
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - id
+      filter: {}
+    comment: ""
