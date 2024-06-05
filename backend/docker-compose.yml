@@ -24,13 +24,14 @@ services:
       - postgres
     environment:
       HASURA_GRAPHQL_DATABASE_URL: ${HASURA_GRAPHQL_DATABASE_URL}
-      HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
-      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      # HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
+      HASURA_GRAPHQL_ENABLE_CONSOLE: true
+      HASURA_GRAPHQL_DEV_MODE: true
     networks:
       - custom-network
-    
+
   express:
-    build: 
+    build:
       context: .
       dockerfile: express.Dockerfile
     container_name: express
@@ -41,7 +42,7 @@ services:
       - .env
     depends_on:
       - postgres
-      
+
 networks:
   custom-network:
     driver: bridge
