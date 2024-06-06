@@ -4,16 +4,18 @@ import dotenv from "dotenv";
 import path from "path";
 
 // Specify the relative path to the .env file
-dotenv.config({ path: path.resolve(__dirname, '../env') });
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
-console.log("Loaded environment variables:", process.env);
+console.log(process.env)
+console.log(process.env.EXPRESS_PORT,'express port');
+// console.log("Loaded environment variables:", process.env);
 
 const envSchema = z.object({
   EXPRESS_PORT: z
     .string()
     .transform((val) => parseInt(val, 10))
     .refine((val) => val > 0 && val < 65536 && !isNaN(val), {
-      message: "Invalid port",
+      message: `Invalid port `,
     }),
   POSTGRES_HOST: z.string(),
   POSTGRES_PORT: z.coerce.number(),
