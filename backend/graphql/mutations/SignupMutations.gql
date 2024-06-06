@@ -1,0 +1,9 @@
+mutation insertUser($obj:afrimeet_users_insert_input!) {
+  user: insert_afrimeet_users_one(object: $obj) {
+    user_id
+    first_name
+    last_name
+    email
+    password
+  }
+}
