@@ -1,13 +1,14 @@
 import { CodegenConfig } from "@graphql-codegen/cli";
 import { TypeScriptPluginConfig } from "@graphql-codegen/typescript";
+import { getNullableType } from "graphql";
 const config: CodegenConfig = {
   overwrite : true,
   schema: "./gqlGen/schema.gql",
   documents: ["graphql/**/*.{graphql,gql}"],
   generates: {
-    ".gql/types.ts": {
-      plugins: ["typescript", "typescript-operations", "type-document-node"],
-      config : {} as TypeScriptPluginConfig  
+    "./gqlGen/types.ts": {
+      plugins: ["typescript", "typescript-operations","typed-document-node"],
+      config : {} satisfies TypeScriptPluginConfig  
     },
   },
 };
