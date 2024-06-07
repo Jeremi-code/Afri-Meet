@@ -3,12 +3,7 @@ import { fromError } from "zod-validation-error";
 import dotenv from "dotenv";
 import path from "path";
 
-// Specify the relative path to the .env file
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
-
-console.log(process.env)
-console.log(process.env.EXPRESS_PORT,'express port');
-// console.log("Loaded environment variables:", process.env);
 
 const envSchema = z.object({
   EXPRESS_PORT: z
