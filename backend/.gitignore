@@ -2,5 +2,3 @@
 node_modules
 gqlGen/schema.gql
 gqlGen/types.ts
-hasura/*
-hasura/metadata/actions.graphql
