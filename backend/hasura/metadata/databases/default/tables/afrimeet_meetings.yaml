@@ -1,3 +1,18 @@
 table:
   name: meetings
   schema: afrimeet
+object_relationships:
+  - name: meetingroom
+    using:
+      foreign_key_constraint_on: room_id
+  - name: user
+    using:
+      foreign_key_constraint_on: user_id
+array_relationships:
+  - name: participants
+    using:
+      foreign_key_constraint_on:
+        column: meeting_id
+        table:
+          name: participants
+          schema: afrimeet

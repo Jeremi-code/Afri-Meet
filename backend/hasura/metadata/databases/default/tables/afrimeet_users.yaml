@@ -1,3 +1,11 @@
 table:
   name: users
   schema: afrimeet
+array_relationships:
+  - name: meetings
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          name: meetings
+          schema: afrimeet

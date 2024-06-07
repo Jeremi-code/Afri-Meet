@@ -1,3 +1,7 @@
 table:
   name: participants
   schema: afrimeet
+object_relationships:
+  - name: meeting
+    using:
+      foreign_key_constraint_on: meeting_id
