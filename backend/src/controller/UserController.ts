@@ -3,8 +3,8 @@ import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { InsertUserDocument } from "../../gqlGen/types";
+import client from "../utils/client";
 
 const userSchema = z.object({
   first_name: z.string().min(2),
@@ -13,40 +13,33 @@ const userSchema = z.object({
   password: z.string().min(6),
 });
 
+const SECRET_KEY = z.string()
+
 const registerUser = async (req: Request, res: Response) => {
   try {
-    console.log('zarema na negem na ')
-      const validateData = userSchema.safeParse(req.body);
-      if (!validateData.success) {
-          throw fromZodError(validateData.error);
-      }
-      const { first_name, last_name, email, password } = validateData.data;
-      const hashedPassword = bcrypt.hashSync(password, 10);
-      jwt.sign({ email }, 'secret key', { expiresIn   : '1h' });
+    const validateData = userSchema.safeParse(req.body.input);
+    const valSecretKey = SECRET_KEY.parse(process.env.JWT_SECRET)
+    if (!validateData.success) {
+      throw fromZodError(validateData.error);
+    }
+    const { first_name, last_name, email, password } = validateData.data;
+    const hashedPassword = bcrypt.hashSync(password, 10);
+    jwt.sign({ email },valSecretKey, { expiresIn: "1h" });
 
-      const client = new ApolloClient({
-          uri: 'https://hasura.io/learn/graphql',
-          cache: new InMemoryCache()
-      });
-
-      client.mutate({
-          mutation:InsertUserDocument,
-          variables : { obj : {
-              first_name ,
-              last_name,
-              email,
-              password:hashedPassword
-
-          }
-
-          }
-      })
-
-  } catch (error : any)
-   {
-      console.log(`Error occured : ${error}`);
+    await client.mutate({
+      mutation: InsertUserDocument,
+      variables: {
+        obj: {
+          first_name,
+          last_name,
+          email,
+          password: hashedPassword,
+        },
+      },
+    });
+  } catch (error: any) {
+    console.log(`Error occured : ${error}`);
   }
-//   res.send("Ermias sintayehu");
 };
 
 export default registerUser;
