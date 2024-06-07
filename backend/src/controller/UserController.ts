@@ -63,15 +63,15 @@ const authUser = async (req: Request, res: Response) => {
       variables: { email },
     });
     const user_id = result.data?.user[0].user_id;
+    const user_pass = result.data?.user[0].password
     if (!user_id) {
       throw error("email does not exist");
     }
-    const hashedPassword = bcrypt.hashSync(password, 10);
     const token = genToken(user_id);
-    if (hashedPassword !== password) {
-      throw new Error("password does not match");
+    const passwordCheck = bcrypt.compareSync(password,user_pass)
+    if (!passwordCheck) {
+      throw error("password mismatch")
     }
-    console.log(result.data?.user[0]?.user_id);
     return res.json({ user_id, token });
   } catch (error) {
     return res.status(401).json({error});
