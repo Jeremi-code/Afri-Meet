@@ -1,4 +1,8 @@
 actions:
+  - name: findUser
+    definition:
+      kind: ""
+      handler: http://host.docker.internal:3000/signin
   - name: signup
     definition:
       kind: synchronous
@@ -8,4 +12,5 @@ custom_types:
   input_objects: []
   objects:
     - name: signupOutput
+    - name: findUserOutput
   scalars: []
