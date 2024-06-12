@@ -6,27 +6,27 @@
         <form @submit.prevent="submitForm">
           <div class="mb-1">
             <label for="firstName" class="block text-gray-700 font-bold text-sm">First Name:</label>
-            <input type="text" id="firstName" v-model="form.firstName" required
+            <input type="text" id="firstName" @input="closeError" v-model="form.firstName" required
               class="bg-white mt-[2px] block w-full rounded-md border border-gray-300 py-[5px] px-2 shadow-sm text-sm" />
           </div>
           <div class="mb-1">
             <label for="lastName" class="block text-gray-700 font-bold text-sm">Last Name:</label>
-            <input type="text" id="lastName" v-model="form.lastName" required
+            <input type="text" id="lastName" @input="closeError" v-model="form.lastName" required
               class="bg-white mt-[2px] block w-full rounded-md border border-gray-300 py-[5px] px-2 shadow-sm text-sm" />
           </div>
           <div class="mb-1">
             <label for="email" class="block text-gray-700 font-bold text-sm">Email:</label>
-            <input type="text" id="email" v-model="form.email" required
+            <input type="text" id="email" @input="closeError" v-model="form.email" required
               class="bg-white mt-[2px] block w-full rounded-md border border-gray-300 py-[5px] px-2 shadow-sm text-sm" />
           </div>
           <div class="mb-1">
             <label for="password" class="block text-gray-700 font-bold text-sm">Password:</label>
-            <input type="password" id="password" v-model="form.password" required
+            <input type="password" id="password" @input="closeError" v-model="form.password" required
               class="bg-white mt-[2px] block w-full rounded-md border border-gray-300 py-[5px] px-2 shadow-sm text-sm" />
           </div>
           <div class="mb-5">
             <label for="confirmPassword" class="block text-gray-700 font-bold text-sm">Confirm Password:</label>
-            <input type="password" id="confirmPassword" v-model="form.confirmPassword" required
+            <input type="password" id="confirmPassword" @input="closeError" v-model="form.confirmPassword" required
               class="bg-white mt-[2px] block w-full rounded-md border border-gray-300 py-[5px] px-2 shadow-sm text-sm" />
           </div>
           <button type="submit"
@@ -68,11 +68,21 @@ const form: Ref<Form> = ref({
   firstName: "",
   lastName: "",
 });
+const formShowError = ref<boolean>(false)
+const errors = ref<{[key:string] : string}>({})
+const closeError = () => {
+  formShowError.value = false
+}
 
 const submitForm = () => {
   const result = signupForm.safeParse(form.value);
   if (!result.success) {
-    alert("Invalid form data");
+    console.log(result.error)
+    formShowError.value = true
+    errors.value = {}
+    result.error.errors.forEach((err) => {
+      errors.value[err.path[0]] = err.message
+    })
     return;
   }
   if (form.value.password !== form.value.confirmPassword) {
