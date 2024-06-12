@@ -7,7 +7,9 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "codegen": "graphql-codegen --watch",
+    "fetch": "get-graphql-schema http://localhost:8080/v1/graphql  > ./gqlGen/schema.graphql"
   },
   "dependencies": {
     "@nuxtjs/tailwindcss": "^6.12.0",
