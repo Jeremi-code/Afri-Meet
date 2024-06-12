@@ -7,13 +7,14 @@
                 <form @submit.prevent="submitForm">
                     <div class="mb-4">
                         <label for="email" class="block text-gray-700 font-bold">Email:</label>
-                        <input type="text" id="email" v-model="form.email" required
+                        <input type="text" id="email" @input="closeError()" v-model="form.email" required 
                             class="mt-1 block w-full rounded-md border border-gray-300 py-[5px] px-3 bg-white shadow-sm" />
-                    </div>
-                    <div class="mb-7 relative">
+                            <div v-if="formErrorVisible && errors.email " class="text-red-500 text-sm mt-1">{{ errors.email}}</div>
+                        </div>
+                    <div class="mb-7">
                         <label for="password" class="block text-gray-700 font-bold">Password:</label>
                         <div class = "relative">
-                            <input :type="passwordVisible ? 'text' : 'password'" id="password" v-model="form.password"
+                            <input :type="passwordVisible ? 'text' : 'password'" id="password" @input="closeError" v-model="form.password"
                                 required
                                 class="mt-1 block w-full rounded-md border border-gray-300 py-[5px] px-3 shadow-sm bg-white" />
                             <div @click="togglePasswordVisibility"
@@ -21,7 +22,8 @@
                                 <UIcon name="fluent:eye-16-regular" v-if="!passwordVisible"/>
                                 <UIcon name="fluent:eye-off-24-regular" v-if="passwordVisible" />
                             </div>
-                        </div>
+                            </div>
+                        <div v-if="formErrorVisible && errors.password" class="text-red-500 text-sm mt-1">{{ errors.password }}</div>
                     </div>
                     <button type="submit"
                         class="w-full bg-[#84CC16] text-white py-[5px] px-4 rounded-md transition-colors hover:opacity-75 mb-5">
@@ -40,22 +42,25 @@
 import { ref } from 'vue';
 import z from 'zod';
 
+const signinForm = z.object({
+    email : z.string().email(),
+    password : z.string().min(6)
+})
+
 interface Form {
     email: string;
     password: string;
-    confirmPassword: string;
-    firstName: string;
-    lastName: string;
 }
 
 const form = ref<Form>({
     email: '',
-    password: '',
-    confirmPassword: '',
-    firstName: '',
-    lastName: '',
+    password: ''
 });
-
+const errors = ref<{ [key: string]: string }>({});
+const formErrorVisible = ref(false)
+const closeError = () => {
+    formErrorVisible.value = false
+}
 const passwordVisible = ref(false);
 
 const togglePasswordVisibility = () => {
@@ -63,23 +68,18 @@ const togglePasswordVisibility = () => {
 };
 
 const submitForm = () => {
-    const signupForm = z.object({
-        email: z.string().email(),
-        password: z.string().min(6),
-        confirmPassword: z.string().min(6),
-        firstName: z.string(),
-        lastName: z.string(),
-    });
-
-    const result = signupForm.safeParse(form.value);
+    console.log('Initial', form.value);
+    
+    const result = signinForm.safeParse(form.value)
     if (!result.success) {
-        alert('Invalid form data');
+        errors.value = {}
+        result.error.errors.forEach((err) => {
+            errors.value[err.path[0]] = err.message;
+            formErrorVisible.value = true
+        });
         return;
     }
-    if (form.value.password !== form.value.confirmPassword) {
-        alert('Passwords do not match');
-        return;
-    }
+
     console.log('Form submitted:', form.value);
 };
 </script>
