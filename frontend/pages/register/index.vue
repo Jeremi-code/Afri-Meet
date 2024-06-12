@@ -8,7 +8,7 @@
             <label for="firstName" class="block text-gray-700 font-bold text-sm">First Name:</label>
             <input type="text" id="firstName" @input="closeError" v-model="form.firstName" required
               class="bg-white mt-[2px] block w-full rounded-md border border-gray-300 py-[5px] px-2 shadow-sm text-sm" />
-          </div>
+            </div>
           <div class="mb-1">
             <label for="lastName" class="block text-gray-700 font-bold text-sm">Last Name:</label>
             <input type="text" id="lastName" @input="closeError" v-model="form.lastName" required
@@ -18,17 +18,22 @@
             <label for="email" class="block text-gray-700 font-bold text-sm">Email:</label>
             <input type="text" id="email" @input="closeError" v-model="form.email" required
               class="bg-white mt-[2px] block w-full rounded-md border border-gray-300 py-[5px] px-2 shadow-sm text-sm" />
-          </div>
+              <div v-if="formShowError && errors.email " class="text-red-500 text-sm mt-1">{{ errors.email}}</div>
+
+            </div>
           <div class="mb-1">
             <label for="password" class="block text-gray-700 font-bold text-sm">Password:</label>
             <input type="password" id="password" @input="closeError" v-model="form.password" required
               class="bg-white mt-[2px] block w-full rounded-md border border-gray-300 py-[5px] px-2 shadow-sm text-sm" />
-          </div>
+              <div v-if="formShowError && errors.password" class="text-red-500 text-sm mt-1" >{{ errors.password }}</div>
+
+            </div>
           <div class="mb-5">
             <label for="confirmPassword" class="block text-gray-700 font-bold text-sm">Confirm Password:</label>
             <input type="password" id="confirmPassword" @input="closeError" v-model="form.confirmPassword" required
               class="bg-white mt-[2px] block w-full rounded-md border border-gray-300 py-[5px] px-2 shadow-sm text-sm" />
-          </div>
+            <div v-if="formShowError && errors.confirmPassword" class="text-red-500 text-sm mt-1" >{{ errors.confirmPassword }}</div>
+            </div>
           <button type="submit"
             class="w-full bg-[#84CC16] text-white py-[5px] px-3 rounded-md transition-colors hover:opacity-75 mb-5 text-sm">
             Sign Up
@@ -83,12 +88,11 @@ const submitForm = () => {
     result.error.errors.forEach((err) => {
       errors.value[err.path[0]] = err.message
     })
-    return;
   }
   if (form.value.password !== form.value.confirmPassword) {
-    alert("Passwords do not match");
-    return;
-  }
-  console.log("Form submitted:", form.value);
-};
+      errors.value.confirmPassword = 'Password does not match'
+      formShowError.value = true
+    };
+    console.log(errors.value)
+}
 </script>
