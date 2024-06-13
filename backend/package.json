@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "codegen": "graphql-codegen --watch",
-    "fetch": "get-graphql-schema http://localhost:8080/v1/graphql  > ./gqlGen/schema.graphql",
+    "fetch": " get-graphql-schema  http://localhost:8080/v1/graphql  > ./gqlGen/schema.graphql",
     "dev": "nodemon ./dist/server.js",
     "hasura": "hasura --project hasura --envfile ../.env --skip-update-check"
   },
@@ -50,6 +50,8 @@
     "get-graphql-schema": "^2.1.2",
     "graphql": "^16.8.1",
     "jsonwebtoken": "^9.0.2",
+    "react": "^18.3.1",
+    "rehackt": "^0.1.0",
     "zod": "^3.23.8",
     "zod-validation-error": "^3.3.0"
   }
