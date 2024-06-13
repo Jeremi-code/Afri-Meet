@@ -19,8 +19,7 @@ const userSchema = z.object({
 
 const registerUser = async (req: Request, res: Response) => {
   try {
-    const validateData = userSchema.safeParse(req.body.input);
-
+    const validateData = userSchema.safeParse(req.body.input.arg1);
     if (!validateData.success) {
       throw fromZodError(validateData.error);
     }
@@ -51,7 +50,6 @@ const authUser = async (req: Request, res: Response) => {
       email: z.string().email(),
       password: z.string().min(6),
     });
-    console.log(req.body.input);
     const validateData = loginSchema.safeParse(req.body.input);
     if (!validateData.success) {
       throw fromZodError(validateData.error);
