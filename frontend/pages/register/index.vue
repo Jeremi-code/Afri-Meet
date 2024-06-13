@@ -65,6 +65,8 @@
 
 <script setup lang="ts">
 import z from "zod";
+import { useMutation } from '@vue/apollo-composable';
+import { SignupDocument } from "~/gqlGen/types";
 
 interface Form {
   email: string;
@@ -89,6 +91,8 @@ const form: Ref<Form> = ref({
   firstName: "",
   lastName: "",
 });
+
+const { mutate, loading, error } = useMutation(SignupDocument);
 const formShowError = ref<boolean>(false)
 const errors = ref<{ [key: string]: string }>({})
 const closeError = () => {
@@ -104,20 +108,36 @@ const toggleConfirmPasswordVisibility = () => {
   confirmPasswordVisible.value = !confirmPasswordVisible.value
 }
 
-const submitForm = () => {
-  const result = signupForm.safeParse(form.value);
-  if (!result.success) {
-    console.log(result.error)
-    formShowError.value = true
-    errors.value = {}
-    result.error.errors.forEach((err) => {
-      errors.value[err.path[0]] = err.message
-    })
+const submitForm = async () => {
+  try {
+    const result = signupForm.safeParse(form.value);
+    if (!result.success) {
+      console.log(result.error)
+      formShowError.value = true
+      errors.value = {}
+      result.error.errors.forEach((err) => {
+        errors.value[err.path[0]] = err.message
+      })
+    }
+    if (form.value.password !== form.value.confirmPassword) {
+      errors.value.confirmPassword = 'Password does not match'
+      formShowError.value = true
+      return
+    };
+    if (result.success) {
+      const response = await mutate({
+        input: {
+          first_name: form.value.firstName,
+          last_name: form.value.lastName,
+          email: form.value.email,
+          password: form.value.password,
+        }
+      })
+      console.log(response)
+      console.log(response?.data?.signup)
+    }
+  } catch(error : any) {
+    console.log(error)
   }
-  if (form.value.password !== form.value.confirmPassword) {
-    errors.value.confirmPassword = 'Password does not match'
-    formShowError.value = true
-  };
-  console.log(errors.value)
-}
+  }
 </script>
