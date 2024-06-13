@@ -97,6 +97,8 @@ const form: Ref<Form> = ref({
   lastName: "",
 });
 
+const router = useRouter()
+
 const { mutate, loading, error } = useMutation(SignupDocument);
 
 const formShowError = ref<boolean>(false)
@@ -144,6 +146,12 @@ const submitForm = async () => {
         const emailErr = response.errors[0]?.message
         throw new Error(emailErr)
       }
+      form.value.email = ''
+      form.value.password = ''
+      form.value.firstName = ''
+      form.value.lastName = ''
+      form.value.confirmPassword = ''
+      router.push('/meetings')
     }
     
   } catch(error : any) {
