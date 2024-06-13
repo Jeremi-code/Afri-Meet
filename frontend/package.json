@@ -12,15 +12,24 @@
     "fetch": "get-graphql-schema http://localhost:8080/v1/graphql  > ./gqlGen/schema.graphql"
   },
   "dependencies": {
+    "@graphql-codegen/typed-document-node": "^5.0.7",
+    "@graphql-codegen/typescript": "^4.0.7",
+    "@graphql-codegen/typescript-operations": "^4.2.1",
+    "@graphql-codegen/typescript-vue-apollo": "^4.1.1",
     "@nuxtjs/tailwindcss": "^6.12.0",
+    "@vue/apollo-composable": "^4.0.2",
     "nuxt": "^3.11.2",
     "vue": "^3.4.27",
     "vue-router": "^4.3.2",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.2",
     "@nuxt/devtools": "latest",
     "@nuxt/ui": "^2.13.0",
-    "@nuxtjs/apollo": "^5.0.0-alpha.14"
+    "@nuxt3/graphql-codegen-module": "^0.0.7",
+    "@nuxtjs/apollo": "^5.0.0-alpha.14",
+    "get-graphql-schema": "^2.1.2",
+    "graphql": "^16.8.1"
   }
 }
