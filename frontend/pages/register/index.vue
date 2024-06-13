@@ -65,8 +65,8 @@
 
 <script setup lang="ts">
 import z from "zod";
-import { useMutation } from '@vue/apollo-composable';
-import { SignupDocument } from "~/gqlGen/types";
+import { useMutation,useQuery } from '@vue/apollo-composable';
+import { CheckUserByEmailDocument, SignupDocument } from "~/gqlGen/types";
 
 interface Form {
   email: string;
@@ -93,6 +93,8 @@ const form: Ref<Form> = ref({
 });
 
 const { mutate, loading, error } = useMutation(SignupDocument);
+const {query} = useQuery(CheckUserByEmailDocument)
+
 const formShowError = ref<boolean>(false)
 const errors = ref<{ [key: string]: string }>({})
 const closeError = () => {
@@ -111,6 +113,7 @@ const toggleConfirmPasswordVisibility = () => {
 const submitForm = async () => {
   try {
     const result = signupForm.safeParse(form.value);
+    
     if (!result.success) {
       console.log(result.error)
       formShowError.value = true
@@ -133,10 +136,15 @@ const submitForm = async () => {
           password: form.value.password,
         }
       })
-      console.log(response)
-      console.log(response?.data?.signup)
+      if (response?.errors && response.errors.length>0){
+        const emailErr = response.errors[0]?.message
+        throw new Error(emailErr)
+      }
     }
+    
   } catch(error : any) {
+    errors.value.email = error.message
+    formShowError.value = true
     console.log(error)
   }
   }
