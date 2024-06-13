@@ -7,15 +7,19 @@ type Query {
 
 type Mutation {
   signup(
-    email: String!
-    first_name: String!
-    last_name: String!
-    password: String!
+    arg1: signupInput
   ): signupOutput
 }
 
+input signupInput {
+  first_name: String!
+  last_name: String!
+  email: String!
+  password: String!
+}
+
 type signupOutput {
-  user_id: Int!
+  user_id: Int
   token: String!
 }
 
