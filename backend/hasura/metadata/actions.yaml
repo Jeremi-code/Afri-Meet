@@ -2,14 +2,15 @@ actions:
   - name: findUser
     definition:
       kind: ""
-      handler: http://host.docker.internal:3000/signin
+      handler: http://172.17.0.1:3001/signin
   - name: signup
     definition:
       kind: synchronous
-      handler: http://host.docker.internal:3000/signup
+      handler: http://172.17.0.1:3001/signup
 custom_types:
   enums: []
-  input_objects: []
+  input_objects:
+    - name: signupInput
   objects:
     - name: signupOutput
     - name: findUserOutput
