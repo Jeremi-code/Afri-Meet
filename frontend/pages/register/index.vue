@@ -50,9 +50,14 @@
             <div v-if="formShowError && errors.confirmPassword" class="text-red-500 text-sm mt-1">{{
               errors.confirmPassword }}</div>
           </div>
-          <button type="submit"
-            class="w-full bg-[#84CC16] text-white py-[5px] px-3 rounded-md transition-colors hover:opacity-75 mb-5 text-sm">
-            Sign Up
+          <button type="submit" :disabled="loading"
+            class="w-full bg-[#84CC16] text-white py-[5px] px-3 rounded-md transition-colors flex justify-center items-center hover:opacity-75 mb-5 text-sm">
+            <template v-if="loading">
+              <div class="spinner mr-2"></div> Loading...
+            </template>
+            <template v-else>
+              Sign Up
+            </template>
           </button>
           <NuxtLink to="/login"
             class="mb-4 text-blue-500 underline text-center text-sm flex justify-center items-center">Already have an
@@ -66,7 +71,7 @@
 <script setup lang="ts">
 import z from "zod";
 import { useMutation,useQuery } from '@vue/apollo-composable';
-import { CheckUserByEmailDocument, SignupDocument } from "~/gqlGen/types";
+import {  SignupDocument } from "~/gqlGen/types";
 
 interface Form {
   email: string;
@@ -93,7 +98,6 @@ const form: Ref<Form> = ref({
 });
 
 const { mutate, loading, error } = useMutation(SignupDocument);
-const {query} = useQuery(CheckUserByEmailDocument)
 
 const formShowError = ref<boolean>(false)
 const errors = ref<{ [key: string]: string }>({})
@@ -149,3 +153,20 @@ const submitForm = async () => {
   }
   }
 </script>
+
+<style scoped>
+.spinner {
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-left-color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+</style>
