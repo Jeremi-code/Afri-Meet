@@ -26,7 +26,6 @@ const registerUser = async (req: Request, res: Response) => {
     }
     const { first_name, last_name, email, password } = validateData.data;
     const hashedPassword = bcrypt.hashSync(password, 10);
-
     const result = await client.mutate({
       mutation: InsertUserDocument,
       variables: {
@@ -42,7 +41,7 @@ const registerUser = async (req: Request, res: Response) => {
     const token = genToken(user_id as Number);
     return res.json({ user_id, token });
   } catch (error: any) {
-    console.log(`Error occured : ${error}`);
+    return res.status(401).json({error})
   }
 };
 
