@@ -1,7 +1,6 @@
 type Query {
   findUser(
-    email: String!
-    password: String!
+    arg1: findUserInput
   ): findUserOutput
 }
 
@@ -14,6 +13,11 @@ type Mutation {
 input signupInput {
   first_name: String!
   last_name: String!
+  email: String!
+  password: String!
+}
+
+input findUserInput {
   email: String!
   password: String!
 }
