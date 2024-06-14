@@ -3,12 +3,12 @@ import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import bcrypt from "bcryptjs";
 import {
+  CheckEmailDocument,
   FindUserByEmailDocument,
   InsertUserDocument,
 } from "../../gqlGen/types";
 import genToken from "../utils/genToken";
 import client from "../utils/client";
-import { error } from "console";
 
 const userSchema = z.object({
   first_name: z.string().min(2),
@@ -21,10 +21,19 @@ const registerUser = async (req: Request, res: Response) => {
   try {
     const validateData = userSchema.safeParse(req.body.input.arg1);
     if (!validateData.success) {
-      throw fromZodError(validateData.error);
+      throw new Error(fromZodError(validateData.error).message);
     }
     const { first_name, last_name, email, password } = validateData.data;
     const hashedPassword = bcrypt.hashSync(password, 10);
+    const userFound = await client.query({
+      query: CheckEmailDocument,
+      variables: { email }
+    });
+    const userFound_id = userFound.data?.user[0]?.user_id;
+    if (userFound_id) {
+      throw new Error('User already exists with this email');
+    }
+
     const result = await client.mutate({
       mutation: InsertUserDocument,
       variables: {
@@ -39,8 +48,8 @@ const registerUser = async (req: Request, res: Response) => {
     const user_id = result.data?.user?.user_id;
     const token = genToken(user_id as Number);
     return res.json({ user_id, token });
-  } catch (error: any) {
-    return res.status(401).json({error})
+  } catch (err: any) {
+    return res.status(401).json({ message: err.message });
   }
 };
 
@@ -50,28 +59,31 @@ const authUser = async (req: Request, res: Response) => {
       email: z.string().email(),
       password: z.string().min(6),
     });
-    const validateData = loginSchema.safeParse(req.body.input);
+    const validateData = loginSchema.safeParse(req.body.input.arg1);
     if (!validateData.success) {
-      throw fromZodError(validateData.error);
+      throw new Error(fromZodError(validateData.error).message);
     }
+
     const { email, password } = validateData.data;
     const result = await client.query({
       query: FindUserByEmailDocument,
       variables: { email },
     });
-    const user_id = result.data?.user[0].user_id;
-    const user_pass = result.data?.user[0].password
-    if (!user_id) {
-      throw error("email does not exist");
+
+    if (!result.data?.user[0]) {
+      throw new Error("Email does not exist");
     }
-    const token = genToken(user_id);
-    const passwordCheck = bcrypt.compareSync(password,user_pass)
+
+    const user = result.data?.user[0];
+    const passwordCheck = bcrypt.compareSync(password, user.password);
     if (!passwordCheck) {
-      throw error("password mismatch")
+      throw new Error("Password does not match");
     }
-    return res.json({ user_id, token });
-  } catch (error) {
-    return res.status(401).json({error});
+    
+    const token = genToken(user.user_id);
+    return res.json({ user_id: user.user_id, token });
+  } catch (err: any) {
+    return res.status(401).json({ message: err.message });
   }
 };
 
