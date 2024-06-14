@@ -9,7 +9,7 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "codegen": "graphql-codegen --watch",
-    "fetch": "get-graphql-schema http://localhost:8080/v1/graphql  > ./gqlGen/schema.graphql"
+    "fetch": "get-graphql-schema http://localhost:8080/v1/graphql  > ./gqlGen/schema.gql"
   },
   "dependencies": {
     "@graphql-codegen/typed-document-node": "^5.0.7",
