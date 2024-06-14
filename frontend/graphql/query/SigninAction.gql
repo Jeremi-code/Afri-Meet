@@ -1,6 +1,0 @@
-query login ($input:findUserInput!) {
-    findUser(arg1:$input) {
-        user_id,
-        token
-    }
-}
