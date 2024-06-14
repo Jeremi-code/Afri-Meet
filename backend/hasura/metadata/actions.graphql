@@ -1,7 +1,13 @@
-type Query {
+type Mutation {
   findUser(
     arg1: findUserInput
   ): findUserOutput
+}
+
+type Mutation {
+  login(
+    arg1: LoginInput!
+  ): LoginOutput!
 }
 
 type Mutation {
@@ -22,6 +28,11 @@ input findUserInput {
   password: String!
 }
 
+input LoginInput {
+  email: String!
+  password: String!
+}
+
 type signupOutput {
   user_id: Int
   token: String!
@@ -30,5 +41,10 @@ type signupOutput {
 type findUserOutput {
   user_id: Int!
   token: String!
+}
+
+type LoginOutput {
+  token: String!
+  user_id: Int!
 }
 
