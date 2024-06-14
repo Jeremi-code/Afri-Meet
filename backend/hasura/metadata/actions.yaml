@@ -11,6 +11,7 @@ custom_types:
   enums: []
   input_objects:
     - name: signupInput
+    - name: findUserInput
   objects:
     - name: signupOutput
     - name: findUserOutput
