@@ -41,7 +41,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import z from 'zod';
-
+import { useQuery } from '@vue/apollo-composable';
+import { LoginDocument } from '~/gqlGen/types';
 const signinForm = z.object({
     email : z.string().email(),
     password : z.string().min(6)
@@ -66,8 +67,18 @@ const passwordVisible = ref(false);
 const togglePasswordVisibility = () => {
     passwordVisible.value = !passwordVisible.value;
 };
+const { result, loading,error,refetch } = useQuery(LoginDocument,() => ({
+    input: {
+      email: form.value.email,
+      password: form.value.password,
+    }
+  }),
+  { enabled: false } 
+);
 
-const submitForm = () => {
+const router = useRouter()
+
+const submitForm = async () => {
     console.log('Initial', form.value);
     
     const result = signinForm.safeParse(form.value)
@@ -79,7 +90,24 @@ const submitForm = () => {
         });
         return;
     }
+    await refetch()
 
     console.log('Form submitted:', form.value);
 };
+watchEffect(() => {
+  if (result.value) {
+    const token = result.value.findUser?.token;
+    if (token) {
+      const tokenCookie = useCookie('token');
+      tokenCookie.value = token;
+      router.push('/meetings')
+    }
+  }
+  
+  if (error.value) {
+    console.error(error.value);
+    formErrorVisible.value = true;
+    errors.value.general = 'An error occurred. Please try again.';
+  }
+});
 </script>
