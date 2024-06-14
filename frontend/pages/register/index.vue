@@ -98,6 +98,7 @@ const form: Ref<Form> = ref({
 });
 
 const router = useRouter()
+const authToken = useCookie('auth-token')
 
 const { mutate, loading, error } = useMutation(SignupDocument);
 
@@ -142,7 +143,10 @@ const submitForm = async () => {
           password: form.value.password,
         }
       })
-      if (response?.errors && response.errors.length>0){
+      if(response?.data?.signup?.token) {
+        authToken.value = response?.data?.signup?.token
+      }
+      else if (response?.errors && response.errors.length>0){
         const emailErr = response.errors[0]?.message
         throw new Error(emailErr)
       }
