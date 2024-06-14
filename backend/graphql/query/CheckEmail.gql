@@ -1,0 +1,5 @@
+query checkEmail($email: String!) {
+  user: afrimeet_users(where: { email: { _eq: $email } }) {
+    user_id,
+  }
+}
