@@ -1,7 +1,11 @@
 actions:
   - name: findUser
     definition:
-      kind: ""
+      kind: asynchronous
+      handler: http://172.17.0.1:3001/signin
+  - name: login
+    definition:
+      kind: synchronous
       handler: http://172.17.0.1:3001/signin
   - name: signup
     definition:
@@ -12,7 +16,9 @@ custom_types:
   input_objects:
     - name: signupInput
     - name: findUserInput
+    - name: LoginInput
   objects:
     - name: signupOutput
     - name: findUserOutput
+    - name: LoginOutput
   scalars: []
