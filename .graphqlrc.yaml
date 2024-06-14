@@ -1,0 +1,2 @@
+# schema: "{frontend,backend}/gqlGen/schema.gql"
+# documents: './graphql/**/*.{graphql,gql}'

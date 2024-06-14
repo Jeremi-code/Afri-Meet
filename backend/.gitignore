@@ -1,4 +1,3 @@
 .env
 node_modules
-gqlGen/schema.gql
-gqlGen/types.ts
+/gqlGen/*
