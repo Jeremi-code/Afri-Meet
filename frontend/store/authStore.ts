@@ -17,6 +17,9 @@ const authStore = defineStore("auth", () => {
     return true
   });
   const login = (newToken: string) => {
+    if(cookieToken.value) {
+      cookieToken.value = null
+    }
     cookieToken.value = newToken;
   };
   const logout = () => {
