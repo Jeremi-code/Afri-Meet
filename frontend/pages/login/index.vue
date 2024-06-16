@@ -1,7 +1,8 @@
 <template>
     <div class="bg-[#F5F5F9] w-screen text-black">
         <div class="flex items-center justify-center h-screen -mt-8">
-            <div class="max-w-md w-[350px] px-6 rounded-md border border-black border-opacity-15 py-8 shadow-sm bg-white">
+            <div
+                class="max-w-md w-[350px] px-6 rounded-md border border-black border-opacity-15 py-8 shadow-sm bg-white">
                 <h1 class="text-3xl text-black font-bold mb-6 text-center">Sign In</h1>
                 <form @submit.prevent="submitForm">
                     <div class="mb-4">
@@ -50,6 +51,7 @@ import z from 'zod';
 import { LoginDocument } from '~/gqlGen/types';
 import { useRouter } from 'vue-router';
 import authStore from '~/store/authStore';
+import { _backgroundColor } from '#tailwind-config/theme';
 
 const signinForm = z.object({
     email: z.string().email(),
@@ -82,11 +84,11 @@ const router = useRouter()
 const storeAuth = authStore()
 const validateForm = () => {
     const result = signinForm.safeParse(form.value)
-    if(!result.success) {
+    if (!result.success) {
         errors.value = {}
         result.error.errors.forEach((err) => {
             errors.value[err.path[0]] = err.message;
-            formErrorVisible.value = true 
+            formErrorVisible.value = true
         })
         return
     }
@@ -125,12 +127,19 @@ const submitForm = async () => {
         }
         else if (response?.errors && response.errors.length > 0) {
             const globalErr = response.errors[0]?.message
-            toast.add({ title: 'Invalid email or password'});
             throw new Error(globalErr)
         }
     } catch (error: any) {
         globalError.value = true
-        toast.add({title : 'invalid email or password'})
+        toast.add({
+            title: 'Invalid email or password',
+            color: 'red',
+            icon: "i-heroicons-x-mark",
+            ui: {
+                backgroundColor: "bg-red-100"
+
+            }
+        });
     }
 }
 </script>
