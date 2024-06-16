@@ -4,7 +4,7 @@ const authStore = defineStore("auth", () => {
   const cookieToken = useCookie("auth-token");
   console.log(cookieToken.value, cookieToken);
   const isAuthenticated = computed(() => {
-    if (!cookieToken) return false;
+    if (!cookieToken.value) return false;
     const decodedToken = jwtDecode(cookieToken.value as string);
     const currentTime: number = Math.floor(Date.now() / 1000);
     const expiredAt = decodedToken.exp;
