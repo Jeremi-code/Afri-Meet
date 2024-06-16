@@ -124,6 +124,14 @@ const submitForm = async () => {
             form.value.email = ''
             form.value.password = ''
             router.push('/meetings')
+            toast.add({
+                title : 'login successful',
+                color : 'green',
+                icon:'i-heroicons-check-circle',
+                ui : {
+                    backgroundColor : 'green'
+                }
+            })
         }
         else if (response?.errors && response.errors.length > 0) {
             const globalErr = response.errors[0]?.message
