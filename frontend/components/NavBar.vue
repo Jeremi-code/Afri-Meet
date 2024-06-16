@@ -1,5 +1,5 @@
 <template>
-    <nav class="absolute top-0 w-screen  bg-white h-16 z-50 border border-">
+    <nav class="sticky top-0 w-screen  bg-white h-16 z-50 border border-">
         <UContainer class="container mx-auto px-4 py-2 flex justify-between items-center h-full">
             <ULink class="text-lg font-bold text-gray-600 hover:text-gray transition-colors duration-300" to="/">
                 Afrimeet
