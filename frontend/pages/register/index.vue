@@ -60,7 +60,8 @@
             </template>
           </button>
           <NuxtLink to="/login"
-            class="mb-4 text-blue-500 underline text-center text-sm flex justify-center items-center">Already have an
+            class="mb-4 text-blue-500 underline text-center text-sm flex justify-center items-center">Already
+            have an
             account?</NuxtLink>
         </form>
       </div>
@@ -70,8 +71,8 @@
 
 <script setup lang="ts">
 import z from "zod";
-import { useMutation,useQuery } from '@vue/apollo-composable';
-import {  SignupDocument } from "~/gqlGen/types";
+import { useMutation, useQuery } from '@vue/apollo-composable';
+import { SignupDocument } from "~/gqlGen/types";
 
 interface Form {
   email: string;
@@ -99,6 +100,7 @@ const form: Ref<Form> = ref({
 
 const router = useRouter()
 const authToken = useCookie('auth-token')
+const toast = useToast()
 
 const { mutate, loading, error } = useMutation(SignupDocument);
 
@@ -120,9 +122,7 @@ const toggleConfirmPasswordVisibility = () => {
 const submitForm = async () => {
   try {
     const result = signupForm.safeParse(form.value);
-    
     if (!result.success) {
-      console.log(result.error)
       formShowError.value = true
       errors.value = {}
       result.error.errors.forEach((err) => {
@@ -143,10 +143,10 @@ const submitForm = async () => {
           password: form.value.password,
         }
       })
-      if(response?.data?.signup?.token) {
+      if (response?.data?.signup?.token) {
         authToken.value = response?.data?.signup?.token
       }
-      else if (response?.errors && response.errors.length>0){
+      else if (response?.errors && response.errors.length > 0) {
         const emailErr = response.errors[0]?.message
         throw new Error(emailErr)
       }
@@ -156,14 +156,22 @@ const submitForm = async () => {
       form.value.lastName = ''
       form.value.confirmPassword = ''
       router.push('/meetings')
+      toast.add({
+        title: "account created successfully",
+        color: 'green',
+        icon: 'i-heroicons-check-circle',
+        ui : {
+          backgroundColor : 'green'
+        }
+
+      })
     }
-    
-  } catch(error : any) {
+
+  } catch (error: any) {
     errors.value.email = error.message
     formShowError.value = true
-    console.log(error)
   }
-  }
+}
 </script>
 
 <style scoped>
