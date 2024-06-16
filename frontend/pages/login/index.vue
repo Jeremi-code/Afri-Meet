@@ -47,9 +47,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import z from 'zod';
-import { useQuery } from '@vue/apollo-composable';
 import { LoginDocument } from '~/gqlGen/types';
 import { useRouter } from 'vue-router';
+import authStore from '~/store/authStore';
+
 const signinForm = z.object({
     email: z.string().email(),
     password: z.string().min(6)
@@ -64,6 +65,7 @@ const form = ref<Form>({
     email: '',
     password: ''
 });
+
 const errors = ref<{ [key: string]: string }>({});
 const formErrorVisible = ref(false)
 const closeError = () => {
@@ -77,44 +79,58 @@ const togglePasswordVisibility = () => {
 };
 const { loading, error, mutate } = useMutation(LoginDocument)
 const router = useRouter()
-const authToken = useCookie('auth-token')
+const storeAuth = authStore()
+const validateForm = () => {
+    const result = signinForm.safeParse(form.value)
+    if(!result.success) {
+        errors.value = {}
+        result.error.errors.forEach((err) => {
+            errors.value[err.path[0]] = err.message;
+            formErrorVisible.value = true 
+        })
+        return
+    }
+}
+
+const toast = useToast()
 
 const submitForm = async () => {
     try {
-        const result = signinForm.safeParse(form.value)
-        if (!result.success) {
-            errors.value = {}
-            result.error.errors.forEach((err) => {
-                errors.value[err.path[0]] = err.message;
-                formErrorVisible.value = true
-            });
-            return;
-        }
+        // const result = signinForm.safeParse(form.value)
+        // if (!result.success) {
+        //     errors.value = {}
+        //     result.error.errors.forEach((err) => {
+        //         errors.value[err.path[0]] = err.message;
+        //         formErrorVisible.value = true
+        //     });
+        //     return;
+        // }
+        validateForm()
         const response = await mutate({
             input: {
-                email: result.data.email,
-                password: result.data.password
+                email: form.value.email,
+                password: form.value.password
             }
         })
         if (response?.data?.login?.token) {
-            if (authToken.value) {
-                console.log(authToken.value)
-                authToken.value = null
-                console.log(authToken.value)
-            }
-            authToken.value = response?.data?.login?.token
+            // if (authToken.value) {
+            //     authToken.value = null
+            // }
+            // authToken.value = response?.data?.login?.token
+            const newToken = response?.data?.login?.token
+            storeAuth.login(newToken)
             form.value.email = ''
             form.value.password = ''
-            console.log('bakela')
             router.push('/meetings')
         }
         else if (response?.errors && response.errors.length > 0) {
             const globalErr = response.errors[0]?.message
+            toast.add({ title: 'Invalid email or password'});
             throw new Error(globalErr)
         }
-        console.log('Form submitted:', response);
     } catch (error: any) {
         globalError.value = true
+        toast.add({title : 'invalid email or password'})
     }
 }
 </script>
