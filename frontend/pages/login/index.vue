@@ -1,8 +1,7 @@
 <template>
     <div class="bg-[#F5F5F9] w-screen text-black">
         <div class="flex items-center justify-center h-screen -mt-8">
-            <div
-                class="max-w-md w-[350px] px-6 rounded-md border border-black border-opacity-15 py-8 shadow-sm bg-white">
+            <div class="max-w-md w-[350px] px-6 rounded-md border border-black border-opacity-15 py-8 shadow-sm bg-white">
                 <h1 class="text-3xl text-black font-bold mb-6 text-center">Sign In</h1>
                 <form @submit.prevent="submitForm">
                     <div class="mb-4">
@@ -50,6 +49,7 @@ import { ref } from 'vue';
 import z from 'zod';
 import { useQuery } from '@vue/apollo-composable';
 import { LoginDocument } from '~/gqlGen/types';
+import { useRouter } from 'vue-router';
 const signinForm = z.object({
     email: z.string().email(),
     password: z.string().min(6)
@@ -70,6 +70,7 @@ const closeError = () => {
     formErrorVisible.value = false
 }
 const passwordVisible = ref(false);
+const globalError = ref(false)
 
 const togglePasswordVisibility = () => {
     passwordVisible.value = !passwordVisible.value;
@@ -104,62 +105,17 @@ const submitForm = async () => {
             authToken.value = response?.data?.login?.token
             form.value.email = ''
             form.value.password = ''
+            console.log('bakela')
             router.push('/meetings')
         }
         else if (response?.errors && response.errors.length > 0) {
-            const emailErr = response.errors[0]?.message
-            throw new Error(emailErr)
+            const globalErr = response.errors[0]?.message
+            throw new Error(globalErr)
         }
         console.log('Form submitted:', response);
     } catch (error: any) {
-        errors.value.email = error.message
-        formErrorVisible.value = true
+        globalError.value = true
     }
-
-//     const result = signinForm.safeParse(form.value)
-//     if (!result.success) {
-//         errors.value = {}
-//         result.error.errors.forEach((err) => {
-//             errors.value[err.path[0]] = err.message;
-//             formErrorVisible.value = true
-//         });
-//         return;
-//     }
-//     const response = await mutate({
-//         input: {
-//             email: result.data.email,
-//             password: result.data.password
-//         }
-//     })
-//     if (response?.data?.login?.token) {
-//         authToken.value = response?.data?.signup?.token
-//     }
-//     else if (response?.errors && response.errors.length > 0) {
-//         const emailErr = response.errors[0]?.message
-//         throw new Error(emailErr)
-//     }
-//     console.log('Form submitted:', response);
-
-// watchEffect(() => {
-// if (result.value) {
-//     console.log(result.value)
-//     const token = result.value.findUser?.token;
-//     if (token) {
-//         const authToken = useCookie('auth-token');
-//         if (authToken.value) {
-//             authToken.value = null
-//         }
-//         authToken.value = token;
-//         router.push('/meetings')
-//     }
-// }
-
-// if (error.value) {
-//     console.error(error.value);
-//     formErrorVisible.value = true;
-//     errors.value.general = 'An error occurred. Please try again.';
-// }
-// });
 }
 </script>
 <style scoped>
