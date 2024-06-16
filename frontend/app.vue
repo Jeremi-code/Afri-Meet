@@ -1,8 +1,10 @@
 <template>
-  <NuxtLayout>
-    <Layout/>
-  </NuxtLayout>
+  <div>
+    <NuxtLayout>
+      <Layout />
+    </NuxtLayout>
+  </div>
 </template>
 <script setup>
-  import Layout from "./layouts/Layout.vue"
+import Layout from "./layouts/Layout.vue"
 </script>
