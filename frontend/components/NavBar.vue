@@ -34,7 +34,7 @@
                 <div  v-if="authenticated" class="flex flex-row px-2">
                     <li>
                         <UButton  class=" text-sm hover:text-gray-900 transition-colors duration-300"
-                            to="/login" variant="link">
+                            to="/login" variant="link" @click="handleLogout">
                             Logout
                         </UButton>
 
@@ -52,6 +52,9 @@ const storeAuth = authStore()
 const authenticated = computed(() => storeAuth.isAuthenticated)
 const activeLink = ref<string>('/')
 
+const handleLogout = () => {
+    storeAuth.logout()
+}
 const setActiveLink = (route: string) => {
     activeLink.value = route
 }
