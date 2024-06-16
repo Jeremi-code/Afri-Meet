@@ -73,6 +73,7 @@
 import z from "zod";
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import { SignupDocument } from "~/gqlGen/types";
+import authStore from "~/store/authStore";
 
 interface Form {
   email: string;
@@ -100,6 +101,7 @@ const form: Ref<Form> = ref({
 
 const router = useRouter()
 const authToken = useCookie('auth-token')
+const storeAuth = authStore()
 const toast = useToast()
 
 const { mutate, loading, error } = useMutation(SignupDocument);
@@ -144,7 +146,10 @@ const submitForm = async () => {
         }
       })
       if (response?.data?.signup?.token) {
-        authToken.value = response?.data?.signup?.token
+        // authToken.value = response?.data?.signup?.token
+        const newToken = response?.data?.signup?.token
+        storeAuth.login(newToken)
+        
       }
       else if (response?.errors && response.errors.length > 0) {
         const emailErr = response.errors[0]?.message
@@ -160,8 +165,8 @@ const submitForm = async () => {
         title: "account created successfully",
         color: 'green',
         icon: 'i-heroicons-check-circle',
-        ui : {
-          backgroundColor : 'green'
+        ui: {
+          backgroundColor: 'green'
         }
 
       })
