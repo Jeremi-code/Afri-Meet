@@ -1,5 +1,5 @@
 <template>
-    <nav class="sticky top-0 w-screen  bg-white h-16 z-50 border border-">
+    <nav class="absolute top-0 w-screen  bg-white h-16 z-50 border border-">
         <UContainer class="container mx-auto px-4 py-2 flex justify-between items-center h-full">
             <ULink class="text-lg font-bold text-gray-600 hover:text-gray transition-colors duration-300" to="/">
                 Afrimeet
@@ -17,19 +17,28 @@
                 <li class="flex items-center">
                     <BaseNavLink label="FAQ" to="/faq" />
                 </li>
-                <div class="flex flex-row px-2">
+                <div v-if="!authenticated" class="flex flex-row px-2">
                     <li>
-                        <UButton @click="register" class="border-50 " to="/register">
+                        <UButton  class="border-50 " to="/register">
                             Register
                         </UButton>
                     </li>
                     <li class="pl-3 text-lg">
-                        <UButton @click="login" class=" text-sm hover:text-gray-900 transition-colors duration-300"
+                        <UButton  class=" text-sm hover:text-gray-900 transition-colors duration-300"
                             to="/login" variant="link">
                             Login
                         </UButton>
                     </li>
 
+                </div>
+                <div  v-if="authenticated" class="flex flex-row px-2">
+                    <li>
+                        <UButton  class=" text-sm hover:text-gray-900 transition-colors duration-300"
+                            to="/login" variant="link">
+                            Logout
+                        </UButton>
+
+                    </li>
                 </div>
             </ul>
         </UContainer>
@@ -37,6 +46,10 @@
 </template>
 
 <script setup lang="ts">
+import authStore from '~/store/authStore';
+
+const storeAuth = authStore()
+const authenticated = computed(() => storeAuth.isAuthenticated)
 const activeLink = ref<string>('/')
 
 const setActiveLink = (route: string) => {
