@@ -1,3 +1,4 @@
 .env
 node_modules
 /gqlGen/*
+/hasura/metadata/actions.yaml

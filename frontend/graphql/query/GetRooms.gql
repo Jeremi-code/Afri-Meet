@@ -1,0 +1,7 @@
+query getRooms {
+ rooms:afrimeet_meetingrooms {
+        room_id,
+        room_name,
+        capacity
+    }
+}
