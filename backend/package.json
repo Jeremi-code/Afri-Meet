@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "codegen": "graphql-codegen --watch",
-    "fetch": " get-graphql-schema  http://localhost:8080/v1/graphql  > ./gqlGen/schema.graphql",
+    "fetch": " get-graphql-schema  http://localhost:8080/v1/graphql  > ./gqlGen/schema.gql",
     "dev": "nodemon ./dist/server.js",
     "hasura": "hasura --project hasura --envfile ../.env --skip-update-check"
   },
