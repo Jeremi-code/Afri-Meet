@@ -46,13 +46,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import z from 'zod';
 import { LoginDocument } from '~/gqlGen/types';
-import { useRouter } from 'vue-router';
 import authStore from '~/store/authStore';
 import { _backgroundColor } from '#tailwind-config/theme';
 
+const { onLogin } = useApollo()
 const signinForm = z.object({
     email: z.string().email(),
     password: z.string().min(6)
@@ -120,16 +119,17 @@ const submitForm = async () => {
             // }
             // authToken.value = response?.data?.login?.token
             const newToken = response?.data?.login?.token
+            onLogin(newToken)
             storeAuth.login(newToken)
             form.value.email = ''
             form.value.password = ''
             router.push('/meetings')
             toast.add({
-                title : 'login successful',
-                color : 'green',
-                icon:'i-heroicons-check-circle',
-                ui : {
-                    backgroundColor : 'green'
+                title: 'login successful',
+                color: 'green',
+                icon: 'i-heroicons-check-circle',
+                ui: {
+                    backgroundColor: 'green'
                 }
             })
         }
