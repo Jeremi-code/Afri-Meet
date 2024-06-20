@@ -8,7 +8,9 @@ const config: CodegenConfig = {
   generates: {
     "./gqlGen/types.ts": {
       plugins: ["typescript", "typescript-operations","typed-document-node"],
-      config : {} satisfies TypeScriptPluginConfig  
+      config : {
+        useTypeImports: true
+      } satisfies TypeScriptPluginConfig  
     },
   },
 };
