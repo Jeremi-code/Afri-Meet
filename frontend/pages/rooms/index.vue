@@ -1,60 +1,12 @@
 <template>
   <NuxtLayout>
-    <UModal v-model="isOpen" prevent-close>
-      <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
-        <template #header>
-          <div class="flex items-center justify-between">
-            <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-              Reserve {{ selectedRoom }}
-            </h3>
-            <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
-              @click="isOpen = false" />
-          </div>
-        </template>
-        <form class="space-y-4">
-          <div class="relative mt-1">
-            <label for="title">Meeting Title</label>
-            <UInput id="title" />
-          </div>
-          <div class="relative mt-1">
-            <label for="room">Room</label>
-            <UInputMenu v-model="selectedRoom" :options="rooms" placeholder="Select a room" id="room" />
-          </div>
-          <div class="relative mt-1">
-            <label for="date">Date</label>
-            <UInput type="date" id="date" />
-          </div>
-          <div class="relative mt-1">
-            <label for="startTime">Start Time</label>
-            <UInput id="startTime" type="time" />
-          </div>
-          <div class="relative mt-1">
-            <label for="endTime">End Time</label>
-            <UInput id="endTime" type="time" />
-          </div>
-          <div class="relative mt-1">
-            <label for="participants">Participants</label>
-            <USelectMenu v-model="selectedParticipants" multiple :options="participants" id="participants">
-              <template #leading>
-                <UIcon v-if="selectedParticipants.icon" :name="(selectedParticipants.icon as string)" class="w-5 h-5" />
-              </template>
-              <template #empty>
-                None Selected
-              </template>
-            </USelectMenu>
-          </div>
-          <div class="flex justify-end mt-4">
-            <UButton label="Save" />
-          </div>
-        </form>
-      </UCard>
-    </UModal>
     <section class="w-full py-12 md:py-16 lg:py-20">
       <div class="container px-4 md:px-6">
         <div class="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           <div v-for="room in data?.rooms"
             class="group relative rounded-xl overflow-hidden shadow-lg transition-all hover:shadow-2xl"
             :key="room.room_id">
+            <Modal :id="room.room_id" :name ="room.room_name" :capacity = "room.capacity" :isOpen="isOpen" v-if="isOpen"/>
             <!-- <a class="absolute inset-0 z-10" href="#">
               <span class="sr-only">View meeting room</span>
             </a> -->
@@ -78,7 +30,7 @@
               <div class="mt-4 flex space-between">
                 <UButton
                   class="text-white inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3 flex-1"
-                  label="Reserve" @click="openModal(0)" />
+                  label="Reserve" @click="openModal()" />
                 <NuxtLink
                   :to="{ name: 'rooms-id', params: { id: room.room_id} }"
                   class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 flex-1">
@@ -138,10 +90,11 @@ const participants: participants[] = [{
 
 const selectedParticipants = ref<participants>(participants[0])
 
-const openModal = (index: number) => {
+const openModal = () => {
   isOpen.value = true;
-  selectedRoom.value = rooms[index];
+  // selectedRoom.value = rooms[index];
 };
+
 
 const showDetails = (id: number) => {
   room.value.id = id;
