@@ -1,0 +1,9 @@
+query GetRoomById ($id:Int!) {
+    room:afrimeet_meetingrooms(where : {room_id:  {
+       _eq: $id
+    }}) {
+        room_id,
+        capacity,
+        room_name
+    }
+}
