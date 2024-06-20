@@ -18,7 +18,8 @@
             <h2 class="text-2xl font-semibold">Room Details</h2>
             <div class="prose prose-stone">
               <p>
-                Our {{roomDetail?.room_name}} is a spacious and modern meeting space that can accommodate up to 8 people. It's
+                Our {{ roomDetail?.room_name }} is a spacious and modern meeting space that can accommodate up to 8
+                people. It's
                 perfect for team meetings, client presentations, or small group discussions.
               </p>
               <p>
@@ -91,17 +92,26 @@
 import { GetRoomByIdDocument } from '~/gqlGen/types';
 import { useAsyncQuery } from '#imports';
 const route = useRoute()
-console.log(route.params.id)
-console.log(route.params)
-const {data,status,error,refresh} = useAsyncQuery(GetRoomByIdDocument,{
-  id : route.params.id
+const { data, status, error, refresh } = useAsyncQuery(GetRoomByIdDocument, {
+  id: route.params.id
 }
 )
-onMounted(() => {
-  refresh()
+interface roomProp {
+  room_name? : string,
+  room_id? : Number,
+  capacity? : Number
+}
+onMounted(async () => {
+  await refresh()
 })
-console.log(toRaw(data.value?.room[0]))
-const roomDetail = toRaw(data.value?.room[0])
+
+const roomDetail = ref<roomProp|undefined>(undefined)
+console.log(data.value?.room[0])
+watchEffect(() => {
+  if(data?.value) {
+    roomDetail.value = toRaw(data?.value.room[0])
+  }
+})
 
 </script>
 
