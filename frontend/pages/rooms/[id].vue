@@ -101,9 +101,6 @@ interface roomProp {
   room_id? : Number,
   capacity? : Number
 }
-onMounted(async () => {
-  await refresh()
-})
 
 const roomDetail = ref<roomProp|undefined>(undefined)
 console.log(data.value?.room[0])
