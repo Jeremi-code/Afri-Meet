@@ -1,0 +1,7 @@
+query GetUsers {
+    users : afrimeet_users {
+        first_name,
+        last_name,
+        email
+    }
+}
