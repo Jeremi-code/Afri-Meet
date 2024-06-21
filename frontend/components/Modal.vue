@@ -38,6 +38,7 @@
           <label for="participants">Participants</label>
           <USelectMenu v-if="participants !== null" v-model="selectedParticipants" multiple :options="formattedParticipants" id="participants">
             <template #leading>
+              <UIcon name="i-heroicons-user-group-20-solid" class="mr-2" />
               <!-- {{ selectedParticipants.map(p => `${p.first_name} ${p.last_name} (${p.email})`).join(', ') }} -->
             </template>
             <template #empty>
