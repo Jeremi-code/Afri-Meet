@@ -35,10 +35,11 @@
             </div>
           </div>
           <div class="flex gap-4">
-            <button
+            <Modal :room="roomDetail " />
+            <!-- <button
               class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-primary-foreground h-11 rounded-md px-8 flex-1 bg-lime-500 hover:bg-lime-600 focus-visible:ring-lime-700">
               Reserve
-            </button>
+            </button> -->
           </div>
         </div>
       </div>
@@ -93,13 +94,18 @@ const { data, status, error, refresh } = useAsyncQuery(GetRoomByIdDocument, {
 }
 )
 interface roomProp {
-  room_name? : string,
-  room_id? : Number,
-  capacity? : Number
+  room_name: string,
+  room_id: number,
+  capacity : number
 }
 
-const roomDetail = ref<roomProp|undefined>(undefined)
-console.log(data.value?.room[0])
+const isOpen = ref(false)
+
+const roomDetail = ref<roomProp>({
+  room_name : '',
+  room_id : 0,
+  capacity : 0
+})
 watchEffect(() => {
   if(data?.value) {
     roomDetail.value = toRaw(data?.value.room[0])
