@@ -6,7 +6,6 @@
           <div v-for="room in data?.rooms"
             class="group relative rounded-xl overflow-hidden shadow-lg transition-all hover:shadow-2xl"
             :key="room.room_id">
-            <Modal :id="room.room_id" :name ="room.room_name" :capacity = "room.capacity" :isOpen="isOpen" v-if="isOpen"/>
             <!-- <a class="absolute inset-0 z-10" href="#">
               <span class="sr-only">View meeting room</span>
             </a> -->
@@ -28,9 +27,7 @@
                 </div>
               </div>
               <div class="mt-4 flex space-between">
-                <UButton
-                  class="text-white inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3 flex-1"
-                  label="Reserve" @click="openModal()" />
+                <Modal :room="room"/>
                 <NuxtLink
                   :to="{ name: 'rooms-id', params: { id: room.room_id} }"
                   class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 flex-1">
@@ -52,9 +49,26 @@
 import { GetRoomsDocument } from '~/gqlGen/types';
 
 const isOpen = ref(false);
-const room = ref({ id: 1 });
+
 const rooms = ['Conference Room A ', 'Boardroom', 'Executive Suite', 'Huddle Room']
-const selectedRoom = ref(rooms[0])
+
+const modalRoom = ref<{
+  id?: number,
+  name?: string,
+  capacity?:number,
+}>({});
+
+const openModal = (id: number, name: string, capacity: number) => {
+  modalRoom.value.id = id;
+  modalRoom.value.name = name;
+  modalRoom.value.capacity = capacity;
+  isOpen.value = true;
+};
+
+const closeModal = () => {
+  isOpen.value = false;
+};
+
 
 interface participants {
   id: string,
@@ -88,22 +102,14 @@ const participants: participants[] = [{
   icon: 'i-heroicons-user-circle'
 }]
 
-const selectedParticipants = ref<participants>(participants[0])
 
-const openModal = () => {
-  isOpen.value = true;
-  // selectedRoom.value = rooms[index];
-};
+// const openModal = () => {
+//   isOpen.value = true;
+//   console.log(isOpen.value)
+//   // selectedRoom.value = rooms[index];
+// };
 
 
-const showDetails = (id: number) => {
-  room.value.id = id;
-};
-
-const removeParticipant = (id: string) => {
-  // selectedParticipants.value = selectedParticipants.value.filter((participant:any) => participant.id !== id);
-};
-const cookie = useCookie('auth-token')
 const { data, status, error, refresh } = useAsyncQuery(GetRoomsDocument)
 interface rooms {
   room_id: Number,
@@ -114,10 +120,8 @@ const roomsList = ref<rooms[]>([])
 watchEffect(() => {
   if (data.value) {
     roomsList.value = toRaw(data.value?.rooms)
-    console.log(toRaw(roomsList.value))
   }
 })
-console.log(roomsList.value)
 onMounted(() => {
   refresh()
 })
