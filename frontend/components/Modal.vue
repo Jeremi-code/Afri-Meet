@@ -17,7 +17,7 @@
         </div>
         <div class="relative mt-1">
           <label for="room">Room</label>
-          <UInputMenu v-model="rooms" :options="rooms" placeholder="Select a room" id="room" />
+          <UInputMenu v-model="selectedRoom" :options="rooms" placeholder="Select a room" id="room" />
         </div>
         <div class="relative mt-1">
           <label for="date">Date</label>
@@ -99,6 +99,8 @@ const participants: Participant[] = [
     icon: 'i-heroicons-user-circle'
   }
 ];
+
+const selectedRoom = ref(props.room.room_name)
 
 const selectedParticipants = ref<Participant>(participants[0]);
 const rooms = ['Conference Room A', 'Boardroom', 'Executive Suite', 'Huddle Room'];
