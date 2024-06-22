@@ -48,11 +48,6 @@
 <script setup lang="ts">
 import { GetRoomsDocument } from '~/gqlGen/types';
 
-const isOpen = ref(false);
-
-const rooms = ['Conference Room A ', 'Boardroom', 'Executive Suite', 'Huddle Room']
-
-
 interface participants {
   id: string,
   label: string,
