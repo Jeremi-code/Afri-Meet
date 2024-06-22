@@ -27,9 +27,8 @@
                 </div>
               </div>
               <div class="mt-4 flex space-between">
-                <Modal :room="room"/>
-                <NuxtLink
-                  :to="{ name: 'rooms-id', params: { id: room.room_id} }"
+                <Modal :room="room" />
+                <NuxtLink :to="{ name: 'rooms-id', params: { id: room.room_id } }"
                   class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 flex-1">
                   View Details
 
@@ -48,53 +47,15 @@
 <script setup lang="ts">
 import { GetRoomsDocument } from '~/gqlGen/types';
 
-interface participants {
-  id: string,
-  label: string,
-  href?: string,
-  target?: string,
-  avatar?: { src: string }
-  icon?: string
-}
-const participants: participants[] = [{
-  id: 'benjamincanac',
-  label: 'benjamincanac',
-  href: 'https://github.com/benjamincanac',
-  target: '_blank',
-  avatar: { src: 'https://avatars.githubusercontent.com/u/739984?v=4' }
-}, {
-  id: 'Atinux',
-  label: 'Atinux',
-  href: 'https://github.com/Atinux',
-  target: '_blank',
-  avatar: { src: 'https://avatars.githubusercontent.com/u/904724?v=4' }
-}, {
-  id: 'smarroufin',
-  label: 'smarroufin',
-  href: 'https://github.com/smarroufin',
-  target: '_blank',
-  avatar: { src: 'https://avatars.githubusercontent.com/u/7547335?v=4' }
-}, {
-  id: 'nobody',
-  label: 'Nobody',
-  icon: 'i-heroicons-user-circle'
-}]
-
-
-// const openModal = () => {
-//   isOpen.value = true;
-//   console.log(isOpen.value)
-//   // selectedRoom.value = rooms[index];
-// };
-
-
-const { data, status, error, refresh } = useAsyncQuery(GetRoomsDocument)
 interface rooms {
   room_id: Number,
   room_name: string,
   capacity: Number
 }
+
 const roomsList = ref<rooms[]>([])
+const { data, status, error, refresh } = useAsyncQuery(GetRoomsDocument)
+
 watchEffect(() => {
   if (data.value) {
     roomsList.value = toRaw(data.value?.rooms)
