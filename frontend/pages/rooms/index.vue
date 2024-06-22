@@ -46,7 +46,6 @@
 
 <script setup lang="ts">
 import { GetRoomsDocument } from '~/gqlGen/types';
-
 interface rooms {
   room_id: Number,
   room_name: string,
