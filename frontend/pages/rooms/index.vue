@@ -52,23 +52,6 @@ const isOpen = ref(false);
 
 const rooms = ['Conference Room A ', 'Boardroom', 'Executive Suite', 'Huddle Room']
 
-const modalRoom = ref<{
-  id?: number,
-  name?: string,
-  capacity?:number,
-}>({});
-
-const openModal = (id: number, name: string, capacity: number) => {
-  modalRoom.value.id = id;
-  modalRoom.value.name = name;
-  modalRoom.value.capacity = capacity;
-  isOpen.value = true;
-};
-
-const closeModal = () => {
-  isOpen.value = false;
-};
-
 
 interface participants {
   id: string,
