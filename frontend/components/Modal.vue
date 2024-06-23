@@ -73,14 +73,24 @@
             </USelectMenu>
           </UFormGroup>
 
-          <!-- Toggle for adding external participant -->
-          <UFormGroup label="Add External Participant">
-            <UToggle v-model="addExternalParticipant" />
+          <!-- Toggle for adding external participants -->
+          <UFormGroup label="Add External Participants">
+            <UToggle v-model="addExternalParticipants" />
           </UFormGroup>
 
-          <!-- Conditional input field for external participant email -->
-          <UFormGroup v-if="addExternalParticipant" label="External Participant Email">
-            <UInput v-model="externalParticipantEmail" type="email" />
+          <!-- Input field for external participant emails with dynamic "X" buttons -->
+          <UFormGroup v-if="addExternalParticipants" label="External Participant Emails">
+            <div class="flex flex-wrap gap-2">
+              <div v-for="(email, index) in meeting.externalParticipants" :key="index" class="relative">
+                <UInput v-model="email" class="pr-10" />
+                <button type="button" @click="removeExternalParticipant(index)" class="absolute top-1 right-1 text-gray-400 hover:text-gray-600">
+                  <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" d="M6.293 6.293a1 1 0 011.414 0L10 8.586l2.293-2.293a1 1 0 111.414 1.414L11.414 10l2.293 2.293a1 1 0 11-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 01-1.414-1.414L8.586 10 6.293 7.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <UButton class="mt-2" label="Add Email" @click="addExternalParticipant" />
           </UFormGroup>
 
           <div class="flex justify-end mt-4">
@@ -94,18 +104,19 @@
 
 <script setup lang="ts">
 import type { ResultOf } from '@graphql-typed-document-node/core';
-import { GetUsersDocument, type GetRoomByIdDocument } from '~/gqlGen/types';
+import { GetUsersDocument, GetRoomByIdDocument } from '~/gqlGen/types';
 import { ref, computed, watchEffect } from 'vue';
 import z from 'zod';
 import { isBefore, isValid, isAfter, addMonths, parse, startOfDay, addDays, addMinutes } from 'date-fns';
 
-interface reservationForm {
+interface ReservationForm {
   title: string;
   room: string;
   date: string;
   start_time: string;
   end_time: string;
   formattedParticipants: string[];
+  externalParticipants: string[];
 }
 
 type Room = ResultOf<typeof GetRoomByIdDocument>['room'][number];
@@ -114,13 +125,14 @@ const props = defineProps<{
 }>();
 
 const selectedRoom = ref(props.room.room_name);
-const meeting = ref<reservationForm>({
+const meeting = ref<ReservationForm>({
   title: '',
   room: selectedRoom.value,
   date: '',
   start_time: '',
   end_time: '',
-  formattedParticipants: []
+  formattedParticipants: [],
+  externalParticipants: []
 });
 
 const errors = ref<string[]>([]);
@@ -162,7 +174,7 @@ const meetingForm = z.object({
     const startTimeDate = parse(startTime, 'h:mm a', new Date());
     return !isNaN(startTimeDate.getTime());
   }, { message: 'Invalid start time format' }),
-  end_time : z.string().min(1),
+  end_time : z.string(),
   // end_time: z.string().refine((endTime: string, data: { start_time: string }) => {
   //   const startTimeDate = parse(data.start_time, 'h:mm a', new Date());
   //   const endTimeDate = parse(endTime, 'h:mm a', new Date());
@@ -170,11 +182,13 @@ const meetingForm = z.object({
   //   return endTimeDate >= endTimePlus10Min;
   // }, { message: 'End time must be at least 10 minutes after start time' }),
   formattedParticipants: z.array(z.string().min(1)).optional(),
+  externalParticipants: z.array(z.string().min(1)).optional(),
 });
 
 const isOpen = ref(false);
-const addExternalParticipant = ref(false);
-const externalParticipantEmail = ref('');
+const addExternalParticipants = ref(false);
+
+const externalParticipantEmails = ref('');
 
 interface Participants {
   first_name: string;
@@ -211,6 +225,15 @@ const formattedParticipants = computed(() =>
     value: p.email,
   })) : []
 );
+
+const addExternalParticipant = () => {
+  meeting.value.externalParticipants.push('');
+};
+
+const removeExternalParticipant = (index: number) => {
+  meeting.value.externalParticipants.splice(index, 1);
+};
+
 </script>
 
 <style scoped>
