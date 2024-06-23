@@ -87,13 +87,6 @@ const meeting = ref<reservationForm>({
   formattedParticipants: []
 });
 
-const validate = (state: any): FormError[] => {
-  const errors = []
-  if (!state.email) errors.push({ path: 'email', message: 'Required' })
-  if (!state.password) errors.push({ path: 'password', message: 'Required' })
-  return errors
-}
-
 
 const errors = ref<string[]>([]);
 const today = new Date()
