@@ -60,7 +60,6 @@
 import type { ResultOf } from '@graphql-typed-document-node/core';
 import { GetUsersDocument, type GetRoomByIdDocument } from '~/gqlGen/types';
 import { ref, computed, watchEffect } from 'vue';
-import type { FormError, FormSubmitEvent } from '#ui/types'
 import z from 'zod';
 
 interface reservationForm {
