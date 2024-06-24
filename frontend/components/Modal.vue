@@ -75,7 +75,7 @@
             </div>
           </UFormGroup>
           <div class="flex justify-end mt-4">
-            <UButton label="Save" type="submit" />
+            <UButton label="Save" type="submit" @click="onSubmit" />
           </div>
         </UForm>
       </UCard>
@@ -195,6 +195,7 @@ interface Participants {
   last_name: string;
   email: string;
 }
+const toast = useToast()
 
 const participants = ref<Participants[] | null>(null);
 const { data } = useAsyncQuery(GetUsersDocument);
@@ -206,17 +207,22 @@ watchEffect(() => {
 });
 
 const onSubmit = () => {
-  console.log(meeting.value.end_time)
-  const validateForm = meetingForm.safeParse(meeting.value);
-  if (!validateForm.success) {
-    errors.value = validateForm.error.errors.map((err) => err.message);
-    return;
+    const normalizedStartedTime = meeting.value.start_time.split(':')
+    const normalizedEndTime = meeting.value.end_time.split(':')
+    if ( normalizedEndTime[0] <= normalizedStartedTime[0]) {
+      if ((parseInt(normalizedEndTime[1]) - parseInt(normalizedStartedTime[1]) < 10) || (parseInt(normalizedEndTime[0]) < parseInt(normalizedStartedTime[0]))) {
+        toast.add({
+            title: 'end time and start time must have at least a 10 min difference',
+            color: 'red',
+            icon: "i-heroicons-x-mark",
+            ui: {
+                backgroundColor: "bg-red-100"
+
+            }
+        });
+      }
+    }    
   }
-  errors.value = [];
-  const data = validateForm.data;
-  console.log(data);
-  // Submit form data
-};
 
 const rooms = ['Conference Room A', 'Boardroom', 'Executive Suite', 'Huddle Room'];
 
