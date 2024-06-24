@@ -1,0 +1,1 @@
+CREATE TABLE "afrimeet"."external_participants" ("name" text, "meeting_id" integer, "externalp_id" serial NOT NULL, PRIMARY KEY ("externalp_id") , FOREIGN KEY ("meeting_id") REFERENCES "afrimeet"."meetings"("meeting_id") ON UPDATE restrict ON DELETE restrict, UNIQUE ("externalp_id"));

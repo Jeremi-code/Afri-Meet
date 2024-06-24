@@ -1,3 +1,4 @@
+- "!include afrimeet_external_participants.yaml"
 - "!include afrimeet_meetingrooms.yaml"
 - "!include afrimeet_meetings.yaml"
 - "!include afrimeet_participants.yaml"
