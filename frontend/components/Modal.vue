@@ -85,7 +85,7 @@
 
 <script setup lang="ts">
 import type { ResultOf } from '@graphql-typed-document-node/core';
-import { GetUsersDocument, GetRoomByIdDocument } from '~/gqlGen/types';
+import { GetUsersDocument, GetRoomByIdDocument, GetRoomsByNameDocument } from '~/gqlGen/types';
 import { ref, computed, watchEffect } from 'vue';
 import z from 'zod';
 import { isBefore, isValid, isAfter, addMonths, parse, startOfDay, addDays, addMinutes } from 'date-fns';
@@ -148,35 +148,62 @@ interface Participants {
   email: string;
 }
 const toast = useToast()
-
 const participants = ref<Participants[] | null>(null);
-const { data } = useAsyncQuery(GetUsersDocument);
+// const { data } = useAsyncQuery(GetUsersDocument);
+const capacity = ref(props.room.capacity)
 
+const getUsers = () => {
+  const { data } = useAsyncQuery(GetUsersDocument)
+  return data
+}
+
+const getCapacity = () => {
+  const { data, status, error, refresh } = useAsyncQuery(GetRoomsByNameDocument, {
+    name: meeting.value.room
+  })
+
+  return data
+}
 watchEffect(() => {
-  if (data.value) {
-    participants.value = data.value.users;
+  const usersData = getUsers()
+  if (usersData.value) {
+    participants.value = usersData.value.users;
+  }
+  const roomData = getCapacity()
+  if (roomData.value) {
+    capacity.value = roomData.value.room[0].capacity
   }
 });
 
 const onSubmit = () => {
-    const normalizedStartedTime = meeting.value.start_time.split(':')
-    const normalizedEndTime = meeting.value.end_time.split(':')
-    if ( normalizedEndTime[0] <= normalizedStartedTime[0]) {
-      if ((parseInt(normalizedEndTime[1]) - parseInt(normalizedStartedTime[1]) < 10) || (parseInt(normalizedEndTime[0]) < parseInt(normalizedStartedTime[0]))) {
-        toast.add({
-            title: 'end time and start time must have at least a 10 min difference',
-            color: 'red',
-            icon: "i-heroicons-x-mark",
-            ui: {
-                backgroundColor: "bg-red-100"
+  const normalizedStartedTime = meeting.value.start_time.split(':')
+  const normalizedEndTime = meeting.value.end_time.split(':')
+  if (normalizedEndTime[0] <= normalizedStartedTime[0]) {
+    if ((parseInt(normalizedEndTime[1]) - parseInt(normalizedStartedTime[1]) < 10) || (parseInt(normalizedEndTime[0]) < parseInt(normalizedStartedTime[0]))) {
+      toast.add({
+        title: 'end time and start time must have at least a 10 min difference',
+        color: 'red',
+        icon: "i-heroicons-x-mark",
+        ui: {
+          backgroundColor: "bg-red-100"
 
-            }
-        });
-        return
-      }
+        }
+      });
+      return
     }
-    console.log()    
   }
+  if (capacity.value < toRaw(meeting.value.formattedParticipants.length)) {
+    toast.add({
+      title: 'Room does not have the capacity for this meeting',
+      color: 'red',
+      icon: "i-heroicons-x-mark",
+      ui: {
+        backgroundColor: "bg-red-100"
+
+      }
+    });
+  }
+}
 
 const rooms = ['Conference Room A', 'Boardroom', 'Executive Suite', 'Huddle Room'];
 
