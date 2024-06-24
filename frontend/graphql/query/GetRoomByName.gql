@@ -1,0 +1,10 @@
+query GetRoomsByName($name : String) {
+    room : afrimeet_meetingrooms (where:  {
+       room_name:  {
+          _eq: $name
+       }
+    }) {
+        capacity,
+        room_id
+    } 
+}
