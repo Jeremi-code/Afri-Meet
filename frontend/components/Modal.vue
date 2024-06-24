@@ -164,6 +164,9 @@ const getCapacity = () => {
   return data
 }
 
+const addMeeting = async () => {
+}
+
 const mutateExternalParticipants = async () => {
   const { mutate, loading, error } = useMutation(AddExternalParticipantDocument)
   const meetingObject = meeting.value.externalParticipants.map((meet) => {
@@ -184,7 +187,7 @@ watchEffect(() => {
   }
 });
 
-const onSubmit = () => {
+const onSubmit = async () => {
   const normalizedStartedTime = meeting.value.start_time.split(':')
   const normalizedEndTime = meeting.value.end_time.split(':')
   if (normalizedEndTime[0] <= normalizedStartedTime[0]) {
@@ -212,6 +215,7 @@ const onSubmit = () => {
       }
     });
   }
+  await mutateExternalParticipants()
   
 }
 const rooms = ['Conference Room A', 'Boardroom', 'Executive Suite', 'Huddle Room'];
