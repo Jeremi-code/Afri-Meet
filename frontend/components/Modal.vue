@@ -78,21 +78,24 @@
             <UToggle v-model="addExternalParticipants" />
           </UFormGroup>
 
-          <!-- Input field for external participant emails with dynamic "X" buttons -->
-          <UFormGroup v-if="addExternalParticipants" label="External Participant Emails">
+          <UFormGroup v-if="addExternalParticipants" label="External Participant Names">
             <div class="flex flex-wrap gap-2">
-              <div v-for="(email, index) in meeting.externalParticipants" :key="index" class="relative">
-                <UInput v-model="email" class="pr-10" />
-                <button type="button" @click="removeExternalParticipant(index)" class="absolute top-1 right-1 text-gray-400 hover:text-gray-600">
-                  <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" d="M6.293 6.293a1 1 0 011.414 0L10 8.586l2.293-2.293a1 1 0 111.414 1.414L11.414 10l2.293 2.293a1 1 0 11-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 01-1.414-1.414L8.586 10 6.293 7.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                  </svg>
-                </button>
+              <div v-for="(name, index) in meeting.externalParticipants" :key="index" class="relative">
+                <span class="bg-gray-200 rounded-md py-1 px-2 flex items-center">
+                  {{ name }}
+                  <button type="button" @click="removeExternalParticipant(index)" class="ml-2 text-gray-400 hover:text-gray-600">
+                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M6.293 6.293a1 1 0 011.414 0L10 8.586l2.293-2.293a1 1 0 111.414 1.414L11.414 10l2.293 2.293a1 1 0 11-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 01-1.414-1.414L8.586 10 6.293 7.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                  </button>
+                </span>
               </div>
             </div>
-            <UButton class="mt-2" label="Add Email" @click="addExternalParticipant" />
+            <div class="flex items-center mt-2">
+              <UInput v-model="newExternalParticipant" placeholder="Add a name" />
+              <UButton class="ml-2" label="Add" @click="addExternalParticipant" />
+            </div>
           </UFormGroup>
-
           <div class="flex justify-end mt-4">
             <UButton label="Save" type="submit" />
           </div>
@@ -163,7 +166,6 @@ const isDateWithinNextMonth = (dateStr: string): boolean => {
   return isAfterToday && isBeforeNextMonth;
 };
 
-// Zod schema for form validation
 const meetingForm = z.object({
   title: z.string().min(1, 'Title is required'),
   room: z.string().min(1, 'Room is required'),
@@ -184,7 +186,7 @@ const meetingForm = z.object({
   formattedParticipants: z.array(z.string().min(1)).optional(),
   externalParticipants: z.array(z.string().min(1)).optional(),
 });
-
+const newExternalParticipant = ref('');
 const isOpen = ref(false);
 const addExternalParticipants = ref(false);
 
@@ -227,7 +229,10 @@ const formattedParticipants = computed(() =>
 );
 
 const addExternalParticipant = () => {
-  meeting.value.externalParticipants.push('');
+  if (newExternalParticipant.value) {
+    meeting.value.externalParticipants.push(newExternalParticipant.value);
+    newExternalParticipant.value = '';
+  }
 };
 
 const removeExternalParticipant = (index: number) => {
@@ -236,6 +241,3 @@ const removeExternalParticipant = (index: number) => {
 
 </script>
 
-<style scoped>
-/* Add your scoped styles here */
-</style>
