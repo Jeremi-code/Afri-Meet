@@ -116,33 +116,10 @@ const meeting = ref<ReservationForm>({
   externalParticipants: []
 });
 
-const errors = ref<string[]>([]);
-
 const parseDate = (dateStr: string) => {
   return startOfDay(parse(dateStr, 'yyyy-MM-dd', new Date()));
 };
 
-const isValidDate = (dateStr: string) => {
-  const date = parseDate(dateStr);
-  return isValid(date);
-};
-
-const parseTime = (timeStr: string): Date => {
-  return parse(timeStr, 'h:mm a', new Date());
-};
-
-const isDateWithinNextMonth = (dateStr: string): boolean => {
-  const date = parseDate(dateStr);
-  const today = startOfDay(new Date());
-  const nextMonth = startOfDay(addMonths(today, 1));
-
-  const datePlusOneDay = addDays(date, 1);
-
-  const isAfterToday = isAfter(datePlusOneDay, today);
-  const isBeforeNextMonth = isBefore(date, nextMonth);
-
-  return isAfterToday && isBeforeNextMonth;
-};
 
 const startOfDayToday = startOfDay(new Date())
 const startOfDayInAMonth = addMonths(startOfDayToday, 1)
@@ -195,8 +172,10 @@ const onSubmit = () => {
 
             }
         });
+        return
       }
-    }    
+    }
+    console.log()    
   }
 
 const rooms = ['Conference Room A', 'Boardroom', 'Executive Suite', 'Huddle Room'];
