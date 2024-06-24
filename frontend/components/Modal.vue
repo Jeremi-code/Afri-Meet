@@ -144,31 +144,6 @@ const isDateWithinNextMonth = (dateStr: string): boolean => {
   return isAfterToday && isBeforeNextMonth;
 };
 
-// const meetingForm = z.object({
-//   title: z.string().min(1, 'Title is required'),
-//   room: z.string().min(1, 'Room is required'),
-//   date: z.string()
-//     .refine(isValidDate, { message: 'Date is Required' })
-//     .refine(isDateWithinNextMonth, { message: 'Date must be within the next month and not in the past' }),
-//   start_time: z.string().refine((startTime: string) => {
-//     console.log("Time:", startTime)
-//     const startTimeDate = parse(startTime,'HH:MM',new Date())
-//     return isValid(startTimeDate)
-//   }, { message: 'Start time is required' }),
-//   end_time : z.string().refine((endTime:string) => {
-//     const endTimeDate = parse(endTime,'hh:mm ',new Date())
-//    ;
-//   }, {message : 'End time is required'}),
-//   formattedParticipants: z.array(z.string().min(1)).optional(),
-//   externalParticipants: z.array(z.string().min(1)).optional(),
-// }).refine((data) => {
-//   const startTimeDate = parse(data.start_time,'hh:mm a',new Date())
-//   console.log(startTimeDate)
-//   const endTimeDate = parse(data.end_time,'hh:mm a', new Date())
-//   const endTimePlus10Min = addMinutes(startTimeDate,10)
-//   return endTimeDate >= endTimePlus10Min
-// })
-
 const startOfDayToday = startOfDay(new Date())
 const startOfDayInAMonth = addMonths(startOfDayToday, 1)
 
