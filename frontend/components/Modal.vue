@@ -85,7 +85,7 @@
 
 <script setup lang="ts">
 import type { ResultOf } from '@graphql-typed-document-node/core';
-import { GetUsersDocument, GetRoomByIdDocument, GetRoomsByNameDocument } from '~/gqlGen/types';
+import { GetUsersDocument, GetRoomByIdDocument, GetRoomsByNameDocument, AddExternalParticipantDocument } from '~/gqlGen/types';
 import { ref, computed, watchEffect } from 'vue';
 import z from 'zod';
 import { isBefore, isValid, isAfter, addMonths, parse, startOfDay, addDays, addMinutes } from 'date-fns';
@@ -149,7 +149,6 @@ interface Participants {
 }
 const toast = useToast()
 const participants = ref<Participants[] | null>(null);
-// const { data } = useAsyncQuery(GetUsersDocument);
 const capacity = ref(props.room.capacity)
 
 const getUsers = () => {
@@ -163,6 +162,16 @@ const getCapacity = () => {
   })
 
   return data
+}
+
+const mutateExternalParticipants = async () => {
+  const { mutate, loading, error } = useMutation(AddExternalParticipantDocument)
+  const meetingObject = meeting.value.externalParticipants.map((meet) => {
+    return {name : meet}
+  })
+  const result = await mutate({
+    names : meetingObject
+  })
 }
 watchEffect(() => {
   const usersData = getUsers()
@@ -203,8 +212,8 @@ const onSubmit = () => {
       }
     });
   }
+  
 }
-
 const rooms = ['Conference Room A', 'Boardroom', 'Executive Suite', 'Huddle Room'];
 
 const formattedParticipants = computed(() =>
