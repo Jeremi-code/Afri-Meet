@@ -2,7 +2,6 @@ import { defineStore } from "pinia";
 import { jwtDecode } from "jwt-decode";
 const authStore = defineStore("auth", () => {
   const cookieToken = useCookie("auth-token");
-  console.log(cookieToken.value, cookieToken);
   const isAuthenticated = computed(() => {
     if (!cookieToken.value) return false;
     const decodedToken = jwtDecode(cookieToken.value as string);
