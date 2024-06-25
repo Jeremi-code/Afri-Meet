@@ -1,0 +1,6 @@
+mutation AddParticipant($input : afrimeet_participants_insert_input!) {
+    insert_afrimeet_participants_one (object : $input) {
+        participant_id,
+        email
+    }
+}
