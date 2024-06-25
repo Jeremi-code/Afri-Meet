@@ -1,5 +1,5 @@
-mutation AddExternalParticipant($names : [afrimeet_external_participants_insert_input!]!) {
-    insert_afrimeet_external_participants (objects:$names) {
+mutation AddExternalParticipant($input : [afrimeet_external_participants_insert_input!]!) {
+    insert_afrimeet_external_participants (objects:$input) {
     affected_rows
     }
 }
