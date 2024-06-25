@@ -258,7 +258,6 @@ const onSubmit = async () => {
     addParticipant(meetingID,meeting.value)
     
   })  
-  // await addParticipant(meetingID, participant)
   await mutateExternalParticipants(meetingID)
 
 }
