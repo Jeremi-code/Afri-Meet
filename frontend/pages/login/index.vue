@@ -119,8 +119,9 @@ const submitForm = async () => {
             // }
             // authToken.value = response?.data?.login?.token
             const newToken = response?.data?.login?.token
+            const user_id = response?.data?.login?.user_id
             onLogin(newToken)
-            storeAuth.login(newToken)
+            storeAuth.login(newToken,user_id)
             form.value.email = ''
             form.value.password = ''
             router.push('/meetings')
