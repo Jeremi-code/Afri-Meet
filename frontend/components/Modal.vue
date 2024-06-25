@@ -90,6 +90,7 @@ import { ref, computed, watchEffect } from 'vue';
 import z from 'zod';
 import { isBefore, isValid, isAfter, addMonths, parse, startOfDay, addDays, addMinutes } from 'date-fns';
 import authStore from '~/store/authStore';
+import type { RefSymbol } from '@vue/reactivity';
 
 interface ReservationForm {
   title: string;
@@ -150,6 +151,7 @@ interface Participants {
 }
 const toast = useToast()
 const participants = ref<Participants[] | null>(null);
+const selectedParticipants = ref<Participants[] | null>(null)
 const capacity = ref(props.room.capacity)
 const room_id = ref(props.room.room_id)
 
@@ -170,6 +172,7 @@ const storeAuth = authStore()
 
 const addMeeting = async () => {
   const { mutate, loading, error } = useMutation(AddMeetingDocument)
+  console.log(storeAuth.user_id)
   const result = await mutate({
     input: {
       title: meeting.value.title,
@@ -220,6 +223,10 @@ watchEffect(() => {
 });
 
 const onSubmit = async () => {
+  const meetingss = meeting.value.formattedParticipants
+  meetingss.forEach((meeting) => {
+    
+  })
   const normalizedStartedTime = meeting.value.start_time.split(':')
   const normalizedEndTime = meeting.value.end_time.split(':')
   if (normalizedEndTime[0] <= normalizedStartedTime[0]) {
@@ -248,10 +255,13 @@ const onSubmit = async () => {
     });
   }
   const meetingResult = await addMeeting()
+  console.log(meetingResult)
   const meetingID = meetingResult?.data?.meeting?.meeting_id
-  for (const participant in formattedParticipants) {
-    await addParticipant(meetingID, participant)
-  }
+  participants.value?.forEach(async (participant) => {
+    await addParticipant(meetingID,participant.email)
+  })
+  
+  // await addParticipant(meetingID, participant)
   await mutateExternalParticipants(meetingID)
 
 }
