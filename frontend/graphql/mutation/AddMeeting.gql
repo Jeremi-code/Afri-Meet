@@ -1,0 +1,6 @@
+mutation AddMeeting($input : afrimeet_meetings_insert_input!) {
+    meeting:insert_afrimeet_meetings_one (object : $input) {
+        meeting_id,
+        creator
+    }
+}
