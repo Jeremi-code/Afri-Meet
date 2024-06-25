@@ -98,7 +98,7 @@ interface ReservationForm {
   date: string;
   start_time: string;
   end_time: string;
-  formattedParticipants: string[];
+  formattedParticipants: Array<{ label: string, value: string }>;
   externalParticipants: string[];
 }
 
@@ -223,10 +223,6 @@ watchEffect(() => {
 });
 
 const onSubmit = async () => {
-  const meetingss = meeting.value.formattedParticipants
-  meetingss.forEach((meeting) => {
-    
-  })
   const normalizedStartedTime = meeting.value.start_time.split(':')
   const normalizedEndTime = meeting.value.end_time.split(':')
   if (normalizedEndTime[0] <= normalizedStartedTime[0]) {
@@ -257,10 +253,11 @@ const onSubmit = async () => {
   const meetingResult = await addMeeting()
   console.log(meetingResult)
   const meetingID = meetingResult?.data?.meeting?.meeting_id
-  participants.value?.forEach(async (participant) => {
-    await addParticipant(meetingID,participant.email)
-  })
-  
+  const meetings = toRaw(meeting.value.formattedParticipants) ;
+  meetings.forEach((meeting ) => {
+    addParticipant(meetingID,meeting.value)
+    
+  })  
   // await addParticipant(meetingID, participant)
   await mutateExternalParticipants(meetingID)
 
