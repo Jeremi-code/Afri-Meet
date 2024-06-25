@@ -85,10 +85,11 @@
 
 <script setup lang="ts">
 import type { ResultOf } from '@graphql-typed-document-node/core';
-import { GetUsersDocument, GetRoomByIdDocument, GetRoomsByNameDocument, AddExternalParticipantDocument } from '~/gqlGen/types';
+import { GetUsersDocument, GetRoomByIdDocument, GetRoomsByNameDocument, AddExternalParticipantDocument, AddMeetingDocument, AddParticipantDocument } from '~/gqlGen/types';
 import { ref, computed, watchEffect } from 'vue';
 import z from 'zod';
 import { isBefore, isValid, isAfter, addMonths, parse, startOfDay, addDays, addMinutes } from 'date-fns';
+import authStore from '~/store/authStore';
 
 interface ReservationForm {
   title: string;
@@ -150,6 +151,7 @@ interface Participants {
 const toast = useToast()
 const participants = ref<Participants[] | null>(null);
 const capacity = ref(props.room.capacity)
+const room_id = ref(props.room.room_id)
 
 const getUsers = () => {
   const { data } = useAsyncQuery(GetUsersDocument)
@@ -164,17 +166,46 @@ const getCapacity = () => {
   return data
 }
 
+const storeAuth = authStore()
+
 const addMeeting = async () => {
+  const { mutate, loading, error } = useMutation(AddMeetingDocument)
+  const result = await mutate({
+    input: {
+      title: meeting.value.title,
+      room_id: room_id.value,
+      date: meeting.value.date,
+      creator: storeAuth.user_id,
+      start_time: meeting.value.start_time,
+      end_time: meeting.value.end_time
+    }
+  })
+  return result
+}
+const addParticipant = async (meeting_id: number | undefined, email: string) => {
+  const { mutate, loading, error } = useMutation(AddParticipantDocument)
+  const result = await mutate({
+    input: {
+      meeting_id: meeting_id,
+      email: email
+    }
+  })
+  return result
 }
 
-const mutateExternalParticipants = async () => {
+const mutateExternalParticipants = async (meeting_id: number | undefined) => {
   const { mutate, loading, error } = useMutation(AddExternalParticipantDocument)
   const meetingObject = meeting.value.externalParticipants.map((meet) => {
-    return {name : meet}
+    return {
+      name: meet,
+      meeting_id: meeting_id
+    }
   })
   const result = await mutate({
-    names : meetingObject
+    input: meetingObject,
+
   })
+  return result
 }
 watchEffect(() => {
   const usersData = getUsers()
@@ -184,6 +215,7 @@ watchEffect(() => {
   const roomData = getCapacity()
   if (roomData.value) {
     capacity.value = roomData.value.room[0].capacity
+    room_id.value = roomData.value.room[0].room_id
   }
 });
 
@@ -215,8 +247,13 @@ const onSubmit = async () => {
       }
     });
   }
-  await mutateExternalParticipants()
-  
+  const meetingResult = await addMeeting()
+  const meetingID = meetingResult?.data?.meeting?.meeting_id
+  for (const participant in formattedParticipants) {
+    await addParticipant(meetingID, participant)
+  }
+  await mutateExternalParticipants(meetingID)
+
 }
 const rooms = ['Conference Room A', 'Boardroom', 'Executive Suite', 'Huddle Room'];
 
