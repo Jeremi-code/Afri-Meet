@@ -172,7 +172,6 @@ const getCapacity = () => {
 const storeAuth = authStore()
 
 const addMeeting = async () => {
-  console.log(storeAuth.cookieToken)
   const { mutate, loading, error } = useMutation(AddMeetingDocument)
   console.log(storeAuth.user_id)
   const result = await mutate({
