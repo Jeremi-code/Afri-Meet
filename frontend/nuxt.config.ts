@@ -2,7 +2,14 @@
 import "@nuxt3/graphql-codegen-module";
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ["@nuxtjs/apollo", "@nuxt/ui", "@nuxt3/graphql-codegen-module","@pinia/nuxt"],
+  modules: [
+    "@nuxtjs/apollo",
+    "@nuxt/ui",
+    "@nuxt3/graphql-codegen-module",
+    "@pinia/nuxt",
+    "nuxt-resend",
+    "nuxt-mail"
+  ],
   apollo: {
     clients: {
       default: {
