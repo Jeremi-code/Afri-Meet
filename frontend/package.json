@@ -23,8 +23,10 @@
     "@vue/apollo-composable": "^4.0.2",
     "date-fns": "^3.6.0",
     "defu": "^6.1.4",
+    "dotenv": "^16.4.5",
     "jwt-decode": "^4.0.0",
     "nuxt": "^3.11.2",
+    "nuxt-mail": "^5.0.1",
     "pinia": "^2.1.8-beta.0",
     "vue": "^3.4.27",
     "vue-router": "^4.3.2",
@@ -37,6 +39,7 @@
     "@nuxt3/graphql-codegen-module": "^0.0.7",
     "@nuxtjs/apollo": "^5.0.0-alpha.14",
     "get-graphql-schema": "^2.1.2",
-    "graphql": "^16.8.1"
+    "graphql": "^16.8.1",
+    "nuxt-resend": "^0.0.2"
   }
 }
