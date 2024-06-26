@@ -90,6 +90,7 @@ import { ref, computed, watchEffect } from 'vue';
 import z from 'zod';
 import { isBefore, isValid, isAfter, addMonths, parse, startOfDay, addDays, addMinutes } from 'date-fns';
 import authStore from '~/store/authStore';
+import sendMeetingEmail from '~/utils/SendEmail'
 import type { RefSymbol } from '@vue/reactivity';
 
 interface ReservationForm {
@@ -171,6 +172,7 @@ const getCapacity = () => {
 const storeAuth = authStore()
 
 const addMeeting = async () => {
+  console.log(storeAuth.cookieToken)
   const { mutate, loading, error } = useMutation(AddMeetingDocument)
   console.log(storeAuth.user_id)
   const result = await mutate({
@@ -254,9 +256,9 @@ const onSubmit = async () => {
   console.log(meetingResult)
   const meetingID = meetingResult?.data?.meeting?.meeting_id
   const meetings = toRaw(meeting.value.formattedParticipants) ;
-  meetings.forEach((meeting ) => {
-    addParticipant(meetingID,meeting.value)
-    
+  meetings.forEach((meet ) => {
+    addParticipant(meetingID,meet.value)
+    sendMeetingEmail(meet.value,'Call for meeting',`<p>you have meeting on Date <strong>${meeting.value.date} from ${meeting.value.start_time} to ${meeting.value.end_time}</strong></p>`)
   })  
   await mutateExternalParticipants(meetingID)
 
