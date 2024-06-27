@@ -7,8 +7,6 @@ export default defineNuxtConfig({
     "@nuxt/ui",
     "@nuxt3/graphql-codegen-module",
     "@pinia/nuxt",
-    "nuxt-resend",
-    "nuxt-mail"
   ],
   apollo: {
     clients: {
