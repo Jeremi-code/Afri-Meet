@@ -35,7 +35,7 @@
             </div>
           </div>
           <div class="flex gap-4">
-            <Modal :room="roomDetail " />
+            <Modal :room="roomDetail" />
             <!-- <button
               class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-primary-foreground h-11 rounded-md px-8 flex-1 bg-lime-500 hover:bg-lime-600 focus-visible:ring-lime-700">
               Reserve
@@ -46,69 +46,93 @@
       <div class="mt-12">
         <h2 class="text-2xl font-semibold mb-4">Upcoming Meetings</h2>
         <div class="grid gap-4">
-          <div class="bg-white dark:bg-gray-950 rounded-lg shadow-lg p-4 flex items-center justify-between">
+          <div v-for="meeting in meetings" :key="meeting.meeting_id" class="bg-white dark:bg-gray-950 rounded-lg shadow-lg p-4 flex items-center justify-between">
             <div>
-              <h3 class="text-lg font-semibold">Marketing Team Meeting</h3>
-              <p class="text-gray-500 dark:text-gray-400">10:00:00 AM</p>
+              <h3 class="text-lg font-semibold">{{ meeting.title }}</h3>
+              <p class="text-gray-500 dark:text-gray-400">{{ meeting.start_time }}</p>
             </div>
-            <div class="flex items-center gap-2">
-              <div
-                class="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
-                data-v0-t="badge">
-                Past
-              </div>
-            </div>
-          </div>
-          <div class="bg-white dark:bg-gray-950 rounded-lg shadow-lg p-4 flex items-center justify-between">
-            <div>
-              <h3 class="text-lg font-semibold">Sales Team Presentation</h3>
-              <p class="text-gray-500 dark:text-gray-400">02:00:00 PM</p>
-            </div>
-            <div class="flex items-center gap-2">
+            <div v-if="getCurrentMilitaryTime() > meeting.start_time" class="flex items-center gap-2">
               <div
                 class="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-200 dark:bg-green-700 text-green-500 dark:text-green-400"
                 data-v0-t="badge">
-                Now
+                Ongoing
               </div>
             </div>
-          </div>
-          <div class="bg-white dark:bg-gray-950 rounded-lg shadow-lg p-4 flex items-center justify-between">
-            <div>
-              <h3 class="text-lg font-semibold">Product Design Review</h3>
-              <p class="text-gray-500 dark:text-gray-400">04:00:00 PM</p>
+            <div v-else class="flex items-center gap-2">
+              <div
+                class="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+                data-v0-t="badge">
+                Later
+              </div>
             </div>
-            <div class="flex items-center gap-2"></div>
-          </div>
-        </div>
+            <!-- You can add badges or other indicators based on meeting status or conditions -->
       </div>
+    </div>
+  </div>
     </div>
   </NuxtLayout>
 </template>
 
 <script lang="ts" setup>
-import { GetRoomByIdDocument } from '~/gqlGen/types';
+import { GetRoomByIdDocument, GetUpcomingMeetingsDocument } from '~/gqlGen/types';
 import { useAsyncQuery } from '#imports';
 const route = useRoute()
-const { data, status, error, refresh } = useAsyncQuery(GetRoomByIdDocument, {
-  id: route.params.id
-}
-)
+
 interface roomProp {
   room_name: string,
   room_id: number,
-  capacity : number
+  capacity: number
 }
+
+interface Meeting {
+  title?: string | null,
+  room_id: number,
+  meeting_id: number,
+  creator: number,
+  start_time: string,
+  end_time: string
+}
+
+function getCurrentMilitaryTime(): string {
+  const now = new Date();
+  const hours = now.getHours().toString().padStart(2, '0');
+  const minutes = now.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
+
 
 const isOpen = ref(false)
 
+const { data: roomData, status, error, refresh } = useAsyncQuery(GetRoomByIdDocument, {
+  id: route.params.id
+}
+)
+const { data: meetingsData, status: meetingsStatus, error: meetingsError, refresh: refreshMeetings } = useAsyncQuery(GetUpcomingMeetingsDocument, {
+  room_id: route.params.id,
+  current_time: getCurrentMilitaryTime()
+  ,
+});
+const meetings = ref<Meeting[]>([]);
+
 const roomDetail = ref<roomProp>({
-  room_name : '',
-  room_id : 0,
-  capacity : 0
+  room_name: '',
+  room_id: 0,
+  capacity: 0
 })
 watchEffect(() => {
-  if(data?.value) {
-    roomDetail.value = toRaw(data?.value.room[0])
+  if (roomData?.value) {
+    roomDetail.value = toRaw(roomData?.value.room[0])
+  }
+  if (meetingsData?.value) {
+    meetings.value = meetingsData.value.meetings.map((meeting: any) => ({
+      meeting_id: meeting.meeting_id,
+      title: meeting.title,
+      room_id: meeting.room_id,
+      date: meeting.date,
+      creator: meeting.creator,
+      start_time: meeting.start_time,
+      end_time: meeting.end_time
+    }));
   }
 })
 
