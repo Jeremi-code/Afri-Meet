@@ -165,6 +165,15 @@ const getUsers = () => {
   return data
 }
 
+const getMeetingId = () => {
+  const {data} = useAsyncQuery(GetMeetingIdDocument)
+  return data
+}
+const getParticipantsBooked = () => {
+  const {data} =useAsyncQuery(GetBookedParticipantsDocument)
+  return data
+}
+
 const getCapacity = () => {
   const { data, status, error, refresh } = useAsyncQuery(GetRoomsByNameDocument, {
     name: meeting.value.room
