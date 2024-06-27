@@ -7,6 +7,10 @@ actions:
     definition:
       kind: synchronous
       handler: http://host.docker.internal:3001/signin
+  - name: sendEmail
+    definition:
+      kind: synchronous
+      handler: http://host.docker.internal:3001/sendEmail
   - name: signup
     definition:
       kind: synchronous
@@ -17,8 +21,10 @@ custom_types:
     - name: signupInput
     - name: findUserInput
     - name: LoginInput
+    - name: sendEmailInput
   objects:
     - name: signupOutput
     - name: findUserOutput
     - name: LoginOutput
+    - name: sendEmailOutput
   scalars: []

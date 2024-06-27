@@ -11,6 +11,12 @@ type Mutation {
 }
 
 type Mutation {
+  sendEmail(
+    obj: sendEmailInput!
+  ): sendEmailOutput
+}
+
+type Mutation {
   signup(
     arg1: signupInput
   ): signupOutput
@@ -33,6 +39,14 @@ input LoginInput {
   password: String!
 }
 
+input sendEmailInput {
+  title: String!
+  to: String!
+  date: String!
+  start_time: String!
+  end_time: String!
+}
+
 type signupOutput {
   user_id: Int
   token: String!
@@ -46,5 +60,9 @@ type findUserOutput {
 type LoginOutput {
   token: String!
   user_id: Int!
+}
+
+type sendEmailOutput {
+  to: String!
 }
 
