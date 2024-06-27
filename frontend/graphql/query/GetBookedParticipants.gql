@@ -1,0 +1,9 @@
+query GetBookedParticipants ($meeting_id : Int!) {
+    participants : afrimeet_partcipants (where : {
+        meeting_id : {
+            _eq : $meeting_id
+        }
+    }) {
+        email
+    }
+}
