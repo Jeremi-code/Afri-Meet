@@ -1,0 +1,20 @@
+query GetUpcomingMeetings($room_id: Int!, $current_time: String!) {
+  meetings: afrimeet_meetings(
+    where: {
+      date: { _eq: "today()" }
+      room_id: { _eq: $room_id }
+      _or: [
+        { start_time: { _gte: $current_time } }
+        { end_time: { _gte: $current_time } }
+      ]
+    }
+    order_by: { start_time: asc }
+    limit: 3
+  ) {
+    meeting_id
+    title
+    start_time
+    end_time
+    creator
+  }
+}
