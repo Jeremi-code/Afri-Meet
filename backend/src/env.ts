@@ -4,7 +4,6 @@ import dotenv from "dotenv";
 import path from "path";
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
-
 const envSchema = z.object({
   EXPRESS_PORT: z
     .string()
@@ -12,6 +11,8 @@ const envSchema = z.object({
     .refine((val) => val > 0 && val < 65536 && !isNaN(val), {
       message: `Invalid port `,
     }),
+  NODEMAILER_EMAIL: z.string(),
+  NODEMAILER_PASSWORD: z.string(),
   POSTGRES_HOST: z.string(),
   POSTGRES_PORT: z.coerce.number(),
   POSTGRES_USER: z.string(),
