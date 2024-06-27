@@ -1,0 +1,17 @@
+query GetMeetingId($date:date!,$start_time:string!,$end_time:string!) {
+   meeting : afrimeet_meetings(where: {
+    date: { _eq: $date },
+    _and: [
+      {
+        _or: [
+          { start_time: { _lte: $startTime }, end_time: { _gte: $startTime } },
+          { start_time: { _lte: $endTime }, end_time: { _gte: $endTime } },
+          { start_time: { _gte: $startTime }, start_time: { _lte: $endTime } },
+          { end_time: { _gte: $startTime }, end_time: { _lte: $endTime } }
+        ]
+      }
+    ]
+  }) {
+    meetingId
+  }
+}
