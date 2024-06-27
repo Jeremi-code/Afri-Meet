@@ -1,0 +1,15 @@
+subscription GetRoomStatus($room_id: Int!, $current_time: String!) {
+  rooms: afrimeet_meetings(
+    where: {
+      date: { _eq: "today()" }
+      room_id: { _eq: $room_id }
+      _and: [
+        { start_time: { _lte: $current_time } }
+        { end_time: { _gte: $current_time } }
+      ]
+    }
+  ) {
+    start_time
+    end_time
+  }
+}
