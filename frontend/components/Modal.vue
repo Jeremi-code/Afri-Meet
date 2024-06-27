@@ -79,18 +79,22 @@
           </div>
         </UForm>
       </UCard>
+      <div v-if="loading" class="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-1200">
+        <div class="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-600" role="status">
+          <span class="spinner"></span>
+        </div>
+      </div>
     </UModal>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { ResultOf } from '@graphql-typed-document-node/core';
-import { GetUsersDocument, GetRoomByIdDocument, GetRoomsByNameDocument, AddExternalParticipantDocument, AddMeetingDocument, AddParticipantDocument } from '~/gqlGen/types';
+import { GetUsersDocument, GetRoomByIdDocument, GetRoomsByNameDocument, AddExternalParticipantDocument, AddMeetingDocument, AddParticipantDocument, SendEmailDocument } from '~/gqlGen/types';
 import { ref, computed, watchEffect } from 'vue';
 import z from 'zod';
 import { isBefore, isValid, isAfter, addMonths, parse, startOfDay, addDays, addMinutes } from 'date-fns';
 import authStore from '~/store/authStore';
-import sendMeetingEmail from '~/utils/SendEmail'
 import type { RefSymbol } from '@vue/reactivity';
 
 interface ReservationForm {
@@ -143,7 +147,7 @@ const meetingForm = z.object({
 const newExternalParticipant = ref('');
 const isOpen = ref(false);
 const addExternalParticipants = ref(false);
-
+const loading = ref(false)
 
 interface Participants {
   first_name: string;
@@ -196,7 +200,19 @@ const addParticipant = async (meeting_id: number | undefined, email: string) => 
   })
   return result
 }
-
+const sendMeetingEmail = async (title: string, to: string, date: string, start_time: string, end_time: string) => {
+  const { mutate, loading, error } = useMutation(SendEmailDocument)
+  const result = await mutate({
+    input: {
+      title,
+      to,
+      date,
+      start_time,
+      end_time
+    }
+  })
+  return result
+}
 const mutateExternalParticipants = async (meeting_id: number | undefined) => {
   const { mutate, loading, error } = useMutation(AddExternalParticipantDocument)
   const meetingObject = meeting.value.externalParticipants.map((meet) => {
@@ -222,6 +238,14 @@ watchEffect(() => {
     room_id.value = roomData.value.room[0].room_id
   }
 });
+const clearForm = () => {
+  meeting.value.date = ''
+  meeting.value.title = ''
+  meeting.value.start_time = ''
+  meeting.value.end_time = ''
+  meeting.value.externalParticipants = []
+  meeting.value.formattedParticipants = []
+}
 
 const onSubmit = async () => {
   const normalizedStartedTime = meeting.value.start_time.split(':')
@@ -240,7 +264,7 @@ const onSubmit = async () => {
       return
     }
   }
-  if (capacity.value < toRaw(meeting.value.formattedParticipants.length)) {
+  if (capacity.value < toRaw(meeting.value.formattedParticipants.length) + toRaw(meeting.value.externalParticipants.length)) {
     toast.add({
       title: 'Room does not have the capacity for this meeting',
       color: 'red',
@@ -250,16 +274,41 @@ const onSubmit = async () => {
 
       }
     });
+    return
   }
-  const meetingResult = await addMeeting()
-  console.log(meetingResult)
-  const meetingID = meetingResult?.data?.meeting?.meeting_id
-  const meetings = toRaw(meeting.value.formattedParticipants) ;
-  meetings.forEach((meet ) => {
-    addParticipant(meetingID,meet.value)
-    sendMeetingEmail(meet.value,'Call for meeting',`<p>you have meeting on Date <strong>${meeting.value.date} from ${meeting.value.start_time} to ${meeting.value.end_time}</strong></p>`)
-  })  
-  await mutateExternalParticipants(meetingID)
+  try {
+
+    loading.value = true
+    const meetingResult = await addMeeting()
+    console.log(meetingResult)
+    const meetingID = meetingResult?.data?.meeting?.meeting_id
+    const meetings = toRaw(meeting.value.formattedParticipants);
+    meetings.forEach(async (meet) => {
+      await addParticipant(meetingID, meet.value)
+      await sendMeetingEmail(meeting.value.title, meet.value, meeting.value.date, meeting.value.start_time, meeting.value.end_time)
+    })
+    await mutateExternalParticipants(meetingID)
+    clearForm()
+    toast.add({
+                title: 'meeting added successfully',
+                color: 'green',
+                icon: 'i-heroicons-check-circle',
+                ui: {
+                    backgroundColor: 'green'
+                }
+            })
+  } catch (error) {
+    toast.add({
+      title : 'Error on Adding meeting ',
+      color : 'red',
+      icon : 'i-heroicons-x-mark',
+      ui: {
+        backgroundColor: "bg-red-100"
+      }
+    })
+  } finally {
+    loading.value = false
+  }
 
 }
 const rooms = ['Conference Room A', 'Boardroom', 'Executive Suite', 'Huddle Room'];
@@ -283,3 +332,23 @@ const removeExternalParticipant = (index: number) => {
 };
 
 </script>
+<style scoped>
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-left-color: #ffffff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+</style>
