@@ -1,4 +1,4 @@
-query GetMeetingId($date:date!,$start_time:string!,$end_time:string!) {
+query GetMeetingId($date:date!,$start_time:String!,$end_time:String!) {
    meeting : afrimeet_meetings(where: {
     date: { _eq: $date },
     _and: [

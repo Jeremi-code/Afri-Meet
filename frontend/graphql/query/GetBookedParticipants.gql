@@ -1,5 +1,5 @@
 query GetBookedParticipants ($meeting_id : Int!) {
-    participants : afrimeet_partcipants (where : {
+    participants : afrimeet_participants (where : {
         meeting_id : {
             _eq : $meeting_id
         }
