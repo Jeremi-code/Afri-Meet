@@ -46,13 +46,17 @@
       <div class="mt-12">
         <h2 class="text-2xl font-semibold mb-4">Upcoming Meetings</h2>
         <div class="grid gap-4">
-          <div v-for="meeting in meetings" :key="meeting.meeting_id" class="bg-white dark:bg-gray-950 rounded-lg shadow-lg p-4 flex items-center justify-between">
-            <div>
-              <h3 class="text-lg font-semibold">{{ meeting.title }}</h3>
-              <p class="text-gray-500 dark:text-gray-400">{{ meeting.start_time }}</p>
-            </div>
-            <div v-if="getCurrentMilitaryTime() > meeting.start_time" class="flex items-center gap-2">
-              <div
+          <div v-if="meetings.length === 0" class="text-gray-500 dark:text-gray-400">
+            No upcoming meetings in this room.
+          </div>
+          <div v-else>
+            <div v-for="meeting in meetings" :key="meeting.meeting_id" class="bg-white dark:bg-gray-950 rounded-lg shadow-lg p-4 flex items-center justify-between">
+              <div>
+                <h3 class="text-lg font-semibold">{{ meeting.title }}</h3>
+                <p class="text-gray-500 dark:text-gray-400">{{ meeting.start_time }}</p>
+              </div>
+              <div v-if="getCurrentMilitaryTime() > meeting.start_time" class="flex items-center gap-2">
+                <div
                 class="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-200 dark:bg-green-700 text-green-500 dark:text-green-400"
                 data-v0-t="badge">
                 Ongoing
@@ -60,11 +64,12 @@
             </div>
             <div v-else class="flex items-center gap-2">
               <div
-                class="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
-                data-v0-t="badge">
-                Later
-              </div>
+              class="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+              data-v0-t="badge">
+              Later
             </div>
+          </div>
+        </div>
             <!-- You can add badges or other indicators based on meeting status or conditions -->
       </div>
     </div>
