@@ -1,0 +1,5 @@
+mutation sendEmail($input : sendEmailInput!) {
+    sendEmail(obj:$input) {
+        to
+    }
+}
