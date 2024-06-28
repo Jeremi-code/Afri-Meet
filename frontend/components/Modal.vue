@@ -90,7 +90,7 @@
 
 <script setup lang="ts">
 import type { ResultOf } from '@graphql-typed-document-node/core';
-import { GetUsersDocument, GetRoomByIdDocument, GetRoomsByNameDocument, AddExternalParticipantDocument, AddMeetingDocument, AddParticipantDocument, SendEmailDocument } from '~/gqlGen/types';
+import { GetUsersDocument, GetRoomByIdDocument, GetRoomsByNameDocument, AddExternalParticipantDocument, AddMeetingDocument, AddParticipantDocument, SendEmailDocument, GetMeetingIdDocument, GetBookedParticipantsDocument, GetRoomByMeetingIdDocument } from '~/gqlGen/types';
 import { ref, computed, watchEffect } from 'vue';
 import z from 'zod';
 import { isBefore, isValid, isAfter, addMonths, parse, startOfDay, addDays, addMinutes } from 'date-fns';
@@ -108,6 +108,8 @@ interface ReservationForm {
 }
 
 type Room = ResultOf<typeof GetRoomByIdDocument>['room'][number];
+type RoomID = ResultOf<typeof GetRoomByMeetingIdDocument>['room'][number]
+type ReservedParticipants = ResultOf<typeof GetBookedParticipantsDocument>['participants']
 const props = defineProps<{
   room: Room;
 }>();
@@ -144,38 +146,55 @@ const meetingForm = z.object({
   externalParticipants: z.array(z.string().min(1)).optional(),
 })
 
-const newExternalParticipant = ref('');
-const isOpen = ref(false);
-const addExternalParticipants = ref(false);
-const loading = ref(false)
 
 interface Participants {
   first_name: string;
   last_name: string;
   email: string;
 }
+
+const newExternalParticipant = ref('');
+const isOpen = ref(false);
+const addExternalParticipants = ref(false);
+const loading = ref(false)
 const toast = useToast()
 const participants = ref<Participants[] | null>(null);
 const selectedParticipants = ref<Participants[] | null>(null)
 const capacity = ref(props.room.capacity)
 const room_id = ref(props.room.room_id)
+const reservedMeetingID = ref(0)
+const reservedParticipants = ref<ReservedParticipants | string | null | undefined>([])
+const reservedRoomId = ref<RoomID | number>()
 
-const getUsers = () => {
-  const { data } = useAsyncQuery(GetUsersDocument)
+const getUsers =  () => {
+  const { data } =  useAsyncQuery(GetUsersDocument)
   return data
 }
 
-const getMeetingId = () => {
-  const {data} = useAsyncQuery(GetMeetingIdDocument)
+const getMeetingId =  () => {
+  const { data } =  useAsyncQuery(GetMeetingIdDocument, {
+    date: meeting.value.date,
+    startTime: meeting.value.start_time,
+    endTime: meeting.value.end_time
+  })
   return data
 }
-const getParticipantsBooked = () => {
-  const {data} =useAsyncQuery(GetBookedParticipantsDocument)
+const getParticipantsBooked =  () => {
+  const { data } =  useAsyncQuery(GetBookedParticipantsDocument, {
+    meeting_id: reservedMeetingID.value
+  })
+  return data
+}
+
+const getReservedRoomId =  () => {
+  const { data } =  useAsyncQuery(GetRoomByMeetingIdDocument, {
+    meeting_id: reservedMeetingID.value
+  })
   return data
 }
 
 const getCapacity = () => {
-  const { data, status, error, refresh } = useAsyncQuery(GetRoomsByNameDocument, {
+  const { data, status, error, refresh } =  useAsyncQuery(GetRoomsByNameDocument, {
     name: meeting.value.room
   })
 
@@ -237,14 +256,35 @@ const mutateExternalParticipants = async (meeting_id: number | undefined) => {
   return result
 }
 watchEffect(() => {
-  const usersData = getUsers()
+  console.log(meeting.value.start_time)
+  const usersData =  getUsers()
   if (usersData.value) {
     participants.value = usersData.value.users;
   }
-  const roomData = getCapacity()
+  const roomData =  getCapacity()
   if (roomData.value) {
     capacity.value = roomData.value.room[0].capacity
     room_id.value = roomData.value.room[0].room_id
+  }
+  const meetingData =  getMeetingId()
+  console.log(meetingData.value,'ye')
+  if (meetingData.value) {
+    console.log('ermi')
+    reservedMeetingID.value = meetingData.value.meeting[0]?.meeting_id
+    console.log(reservedMeetingID.value,'what is happening')
+  }
+  if (reservedMeetingID) {
+    const participantData =  getParticipantsBooked()
+    const reservedRoomID =  getReservedRoomId()
+
+    if (participantData.value) {
+      reservedParticipants.value = participantData.value.participants[0]?.email
+      console.log(reservedParticipants.value)
+    }
+    if (reservedRoomId.value) {
+      reservedRoomId.value = reservedRoomID.value?.room[0].room_id
+      console.log(reservedRoomId.value)
+    } 
   }
 });
 const clearForm = () => {
@@ -257,6 +297,7 @@ const clearForm = () => {
 }
 
 const onSubmit = async () => {
+  console.log(reservedMeetingID.value)
   const normalizedStartedTime = meeting.value.start_time.split(':')
   const normalizedEndTime = meeting.value.end_time.split(':')
   if (normalizedEndTime[0] <= normalizedStartedTime[0]) {
@@ -285,6 +326,38 @@ const onSubmit = async () => {
     });
     return
   }
+  if (reservedMeetingID.value) {
+    console.log(reservedMeetingID.value)
+    if (room_id.value == reservedRoomId.value) {
+      toast.add({
+        title: 'The Room is reserved at this time',
+        color: 'red',
+        icon: "i-heroicons-x-mark",
+        ui: {
+          backgroundColor: "bg-red-100"
+
+        }
+      });
+      return
+    } else if (reservedParticipants) {
+      const meetings = toRaw(meeting.value.formattedParticipants)
+      meetings.forEach((meet) => {
+        if (reservedParticipants.value?.includes(meet.value)) {
+          toast.add({
+            title: 'Person who is invited to a meeting at the time is included',
+            color: 'red',
+            icon: "i-heroicons-x-mark",
+            ui: {
+              backgroundColor: "bg-red-100"
+
+            }
+          });
+          return
+        }
+      })
+    }
+  }
+
   try {
 
     loading.value = true
@@ -299,24 +372,25 @@ const onSubmit = async () => {
     await mutateExternalParticipants(meetingID)
     clearForm()
     toast.add({
-                title: 'meeting added successfully',
-                color: 'green',
-                icon: 'i-heroicons-check-circle',
-                ui: {
-                    backgroundColor: 'green'
-                }
-            })
+      title: 'meeting added successfully',
+      color: 'green',
+      icon: 'i-heroicons-check-circle',
+      ui: {
+        backgroundColor: 'green'
+      }
+    })
   } catch (error) {
     toast.add({
-      title : 'Error on Adding meeting ',
-      color : 'red',
-      icon : 'i-heroicons-x-mark',
+      title: 'Error on Adding meeting ',
+      color: 'red',
+      icon: 'i-heroicons-x-mark',
       ui: {
         backgroundColor: "bg-red-100"
       }
     })
   } finally {
     loading.value = false
+    isOpen.value = false
   }
 
 }
