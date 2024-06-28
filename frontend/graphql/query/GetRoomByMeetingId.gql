@@ -1,0 +1,5 @@
+query GetRoomByMeetingId($meeting_id: Int!) {
+  room : afrimeet_meetings(where: { meeting_id: { _eq: $meeting_id } }) {
+    room_id
+  }
+}
