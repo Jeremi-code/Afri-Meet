@@ -46,6 +46,11 @@
 
 <script setup lang="ts">
 import { GetRoomsDocument } from '~/gqlGen/types';
+
+definePageMeta({
+  middleware: 'auth' // this should match the name of the file inside the middleware directory 
+})
+
 interface rooms {
   room_id: Number,
   room_name: string,
