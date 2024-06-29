@@ -1,0 +1,34 @@
+query GetMeetingsForUser($user_id: Int!, $email: String!) {
+  createdMeetings: afrimeet_meetings(where: { creator: { _eq: $user_id } }) {
+    meeting_id
+    title
+    date
+    start_time
+    end_time
+    creator
+    room_id
+    participants {
+      email
+    }
+    external_participants {
+      name
+    }
+  }
+  joinedMeetings: afrimeet_meetings(
+    where: { participants: { email: { _eq: $email } } }
+  ) {
+    meeting_id
+    title
+    date
+    start_time
+    end_time
+    creator
+    room_id
+    participants {
+      email
+    }
+    external_participants {
+      name
+    }
+  }
+}
