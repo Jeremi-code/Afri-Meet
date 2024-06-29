@@ -4,10 +4,10 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div class="relative rounded-xl overflow-hidden shadow-lg transition-all hover:shadow-2xl">
           <img
-            src="https://www.airbnb.com/rooms/18155163?adults=1&category_tag=Tag%3A8678&children=0&enable_m3_private_room=true&infants=0&pets=0&photo_id=357232215&search_mode=flex_destinations_search&check_in=2024-07-13&check_out=2024-07-18&source_impression_id=p3_1718232511_P3RMjFWT39BVdZgL&previous_page_section_name=1000&federated_search_id=c0dde8b9-d7d6-4f4f-97d3-bf58b49e52deg"
+            src="c:\Users\Jeremiah\Downloads\boardroom.jpg"
             width="800" height="600" alt="Meeting room"
-            class="w-full h-[400px] object-cover group-hover:opacity-80 transition-opacity"
-            style="aspect-ratio: 800 / 600; object-fit: cover;" />
+            class="w-full h-[550px] object-cover group-hover:opacity-80 transition-opacity"
+            style="aspect-ratio: 800 / 600; " />
         </div>
         <div class="space-y-6">
           <div>
