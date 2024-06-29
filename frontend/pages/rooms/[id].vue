@@ -3,9 +3,7 @@
     <div class="max-w-6xl mx-auto py-12 md:py-16 lg:py-20 px-4 md:px-6">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div class="relative rounded-xl overflow-hidden shadow-lg transition-all hover:shadow-2xl">
-          <img
-            src="c:\Users\Jeremiah\Downloads\boardroom.jpg"
-            width="800" height="600" alt="Meeting room"
+          <img src="c:\Users\Jeremiah\Downloads\boardroom.jpg" width="800" height="600" alt="Meeting room"
             class="w-full h-[550px] object-cover group-hover:opacity-80 transition-opacity"
             style="aspect-ratio: 800 / 600; " />
         </div>
@@ -36,10 +34,6 @@
           </div>
           <div class="flex gap-4">
             <Modal :room="roomDetail" />
-            <!-- <button
-              class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-primary-foreground h-11 rounded-md px-8 flex-1 bg-lime-500 hover:bg-lime-600 focus-visible:ring-lime-700">
-              Reserve
-            </button> -->
           </div>
         </div>
       </div>
@@ -50,30 +44,31 @@
             No upcoming meetings in this room.
           </div>
           <div v-else>
-            <div v-for="meeting in meetings" :key="meeting.meeting_id" class="bg-white dark:bg-gray-950 rounded-lg shadow-lg p-4 flex items-center justify-between">
+            <div v-for="meeting in meetings" :key="meeting.meeting_id"
+              class="bg-white dark:bg-gray-950 rounded-lg shadow-lg p-4 flex items-center justify-between">
               <div>
                 <h3 class="text-lg font-semibold">{{ meeting.title }}</h3>
                 <p class="text-gray-500 dark:text-gray-400">{{ meeting.start_time }}</p>
               </div>
               <div v-if="getCurrentMilitaryTime() > meeting.start_time" class="flex items-center gap-2">
                 <div
-                class="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-200 dark:bg-green-700 text-green-500 dark:text-green-400"
-                data-v0-t="badge">
-                Ongoing
+                  class="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-200 dark:bg-green-700 text-green-500 dark:text-green-400"
+                  data-v0-t="badge">
+                  Ongoing
+                </div>
+              </div>
+              <div v-else class="flex items-center gap-2">
+                <div
+                  class="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+                  data-v0-t="badge">
+                  Later
+                </div>
               </div>
             </div>
-            <div v-else class="flex items-center gap-2">
-              <div
-              class="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
-              data-v0-t="badge">
-              Later
-            </div>
+            <!-- You can add badges or other indicators based on meeting status or conditions -->
           </div>
         </div>
-            <!-- You can add badges or other indicators based on meeting status or conditions -->
       </div>
-    </div>
-  </div>
     </div>
   </NuxtLayout>
 </template>
