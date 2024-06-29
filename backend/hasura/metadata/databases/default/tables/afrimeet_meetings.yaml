@@ -6,6 +6,13 @@ object_relationships:
     using:
       foreign_key_constraint_on: room_id
 array_relationships:
+  - name: external_participants
+    using:
+      foreign_key_constraint_on:
+        column: meeting_id
+        table:
+          name: external_participants
+          schema: afrimeet
   - name: participants
     using:
       foreign_key_constraint_on:
