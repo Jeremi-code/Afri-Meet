@@ -149,7 +149,8 @@ const submitForm = async () => {
         // authToken.value = response?.data?.signup?.token
         const newToken = response?.data?.signup?.token
         const user_id = response?.data?.signup?.user_id
-        storeAuth.login(newToken,user_id as number)
+        const user_email = form.value.email
+        storeAuth.login(newToken,user_id as number,user_email)
         
       }
       else if (response?.errors && response.errors.length > 0) {
