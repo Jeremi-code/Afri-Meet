@@ -48,7 +48,6 @@
 <script setup lang="ts">
 import z from 'zod';
 import { LoginDocument } from '~/gqlGen/types';
-import authStore from '~/store/authStore';
 import { _backgroundColor } from '#tailwind-config/theme';
 
 const { onLogin } = useApollo()
@@ -66,6 +65,7 @@ const form = ref<Form>({
     email: '',
     password: ''
 });
+const jwtParser = useJwtParser()
 
 const errors = ref<{ [key: string]: string }>({});
 const formErrorVisible = ref(false)
@@ -80,7 +80,7 @@ const togglePasswordVisibility = () => {
 };
 const { loading, error, mutate } = useMutation(LoginDocument)
 const router = useRouter()
-const storeAuth = authStore()
+const authStore = useAuthStore()
 const validateForm = () => {
     const result = signinForm.safeParse(form.value)
     if (!result.success) {
@@ -121,19 +121,26 @@ const submitForm = async () => {
             const newToken = response?.data?.login?.token
             const user_id = response?.data?.login?.user_id
             const user_email = form.value.email
-            onLogin(newToken)
-            storeAuth.login(newToken, user_id, user_email)
-            form.value.email = ''
-            form.value.password = ''
-            router.push('/meetings')
-            toast.add({
-                title: 'login successful',
-                color: 'green',
-                icon: 'i-heroicons-check-circle',
-                ui: {
-                    backgroundColor: 'green'
-                }
-            })
+            const parseResult = await jwtParser.parse(newToken)
+            if (parseResult) {
+                const {payload} = parseResult
+                console.log(payload)
+                toast.add({
+                    title: 'login successful',
+                    color: 'green',
+                    icon: 'i-heroicons-check-circle',
+                    ui: {
+                        backgroundColor: 'green'
+                    }
+                })
+                onLogin(newToken)
+                authStore.login(newToken, user_id, user_email)
+                navigateTo('/meetings')
+            }
+            // onLogin(newToken)
+            // storeAuth.login(newToken, user_id, user_email)
+            // form.value.email = ''
+            // form.value.password = ''
         }
         else if (response?.errors && response.errors.length > 0) {
             const globalErr = response.errors[0]?.message
