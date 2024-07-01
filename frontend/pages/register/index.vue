@@ -73,7 +73,6 @@
 import z from "zod";
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import { SignupDocument } from "~/gqlGen/types";
-import authStore from "~/store/authStore";
 
 interface Form {
   email: string;
@@ -101,7 +100,7 @@ const form: Ref<Form> = ref({
 
 const router = useRouter()
 const authToken = useCookie('auth-token')
-const storeAuth = authStore()
+const storeAuth = useAuthStore()
 const toast = useToast()
 
 const { mutate, loading, error } = useMutation(SignupDocument);
