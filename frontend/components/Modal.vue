@@ -94,7 +94,6 @@ import { GetUsersDocument, GetRoomByIdDocument, GetRoomsByNameDocument, AddExter
 import { ref, computed, watchEffect } from 'vue';
 import z from 'zod';
 import { isBefore, isValid, isAfter, addMonths, parse, startOfDay, addDays, addMinutes } from 'date-fns';
-import authStore from '~/store/authStore';
 import type { RefSymbol } from '@vue/reactivity';
 
 interface ReservationForm {
@@ -201,17 +200,17 @@ const getCapacity = () => {
   return data
 }
 
-const storeAuth = authStore()
+const authStore = useAuthStore()
 
 const addMeeting = async () => {
   const { mutate, loading, error } = useMutation(AddMeetingDocument)
-  console.log(storeAuth.user_id)
+  console.log(authStore.user_id)
   const result = await mutate({
     input: {
       title: meeting.value.title,
       room_id: room_id.value,
       date: meeting.value.date,
-      creator: storeAuth.user_id,
+      creator: authStore.user_id,
       start_time: meeting.value.start_time,
       end_time: meeting.value.end_time
     }
