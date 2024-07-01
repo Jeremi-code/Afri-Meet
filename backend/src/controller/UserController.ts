@@ -75,7 +75,6 @@ const authUser = async (req: Request, res: Response) => {
 
     const user = result.data?.user[0];
     const passwordCheck = bcrypt.compareSync(password, user.password);
-    console.log(passwordCheck)
     if (!passwordCheck) {
       throw new Error("Password does not match");
     }
