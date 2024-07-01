@@ -1,11 +1,11 @@
 import jwt from 'jsonwebtoken'
-import {z} from 'zod'
+import { env } from '../env'
 
-const SECRET_KEY = z.string()
+const PRIVATE_KEY = env.PRIVATE_KEY
+const PASSPHRASE = env.PASSPHRASE
 
-const genToken = (user_id : Number) : string => {
-    const valSecretKey = SECRET_KEY.parse(process.env.JWT_SECRET)
-    const token = jwt.sign({user_id},valSecretKey,{expiresIn : '1h'})
+const genToken = (user_id: Number): string => {
+    const token = jwt.sign({ user_id }, { key: PRIVATE_KEY, passphrase: PASSPHRASE }, { expiresIn: '1h' })
     return token
 }
 
