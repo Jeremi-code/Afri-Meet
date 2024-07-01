@@ -145,7 +145,6 @@
 </template>
 <script setup lang="ts">
 import { GetMeetingsForUserDocument, GetRoomsDocument, GetUsersDocument } from '~/gqlGen/types';
-import authStore from '~/store/authStore';
 
 definePageMeta({
   middleware: 'auth'
@@ -195,8 +194,9 @@ interface Users {
 }
 const loading = ref(true)
 
-const storeAuth = authStore()
-const user = ref<User>({ user_id: storeAuth.user_id, email: storeAuth.user_email, first_name: "", last_name: "" })
+const authStore = useAuthStore()
+const {user_email, user_id} = storeToRefs(authStore)
+const user = ref<User>({ user_id: user_id.value!, email: user_email.value!, first_name: "", last_name: "" })
 
 const roomsList = ref<Room[]>([])
 const { data: roomData, status: roomStatus, error: roomError, refresh: refreshRoom } = useAsyncQuery(GetRoomsDocument)
