@@ -46,7 +46,7 @@ const registerUser = async (req: Request, res: Response) => {
       },
     });
     const user_id = result.data?.user?.user_id;
-    const token = genToken(user_id as Number);
+    const token = genToken(user_id as Number, email);
     return res.json({ user_id, token });
   } catch (err: any) {
     return res.status(401).json({ message: err.message });
@@ -63,7 +63,6 @@ const authUser = async (req: Request, res: Response) => {
     if (!validateData.success) {
       throw new Error(fromZodError(validateData.error).message);
     }
-
     const { email, password } = validateData.data;
     const result = await client.query({
       query: FindUserByEmailDocument,
@@ -76,11 +75,11 @@ const authUser = async (req: Request, res: Response) => {
 
     const user = result.data?.user[0];
     const passwordCheck = bcrypt.compareSync(password, user.password);
+    console.log(passwordCheck)
     if (!passwordCheck) {
       throw new Error("Password does not match");
     }
-    
-    const token = genToken(user.user_id);
+    const token = genToken(user.user_id, email);
     return res.json({ user_id: user.user_id, token });
   } catch (err: any) {
     return res.status(401).json({ message: err.message });
