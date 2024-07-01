@@ -15,4 +15,12 @@ export default defineNuxtConfig({
       },
     },
   },
+  runtimeConfig : {
+    public : {
+      jwtKey : process.env.NUXT_JWT_KEY
+    }
+  },
+  pinia: {
+    storesDirs: ['./store/**']
+  }
 });
