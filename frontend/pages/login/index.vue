@@ -97,15 +97,6 @@ const toast = useToast()
 
 const submitForm = async () => {
     try {
-        // const result = signinForm.safeParse(form.value)
-        // if (!result.success) {
-        //     errors.value = {}
-        //     result.error.errors.forEach((err) => {
-        //         errors.value[err.path[0]] = err.message;
-        //         formErrorVisible.value = true
-        //     });
-        //     return;
-        // }
         validateForm()
         const response = await mutate({
             input: {
@@ -114,10 +105,6 @@ const submitForm = async () => {
             }
         })
         if (response?.data?.login?.token) {
-            // if (authToken.value) {
-            //     authToken.value = null
-            // }
-            // authToken.value = response?.data?.login?.token
             const newToken = response?.data?.login?.token
             const user_id = response?.data?.login?.user_id
             const user_email = form.value.email
@@ -137,10 +124,6 @@ const submitForm = async () => {
                 authStore.login(newToken, user_id, user_email)
                 navigateTo('/meetings')
             }
-            // onLogin(newToken)
-            // storeAuth.login(newToken, user_id, user_email)
-            // form.value.email = ''
-            // form.value.password = ''
         }
         else if (response?.errors && response.errors.length > 0) {
             const globalErr = response.errors[0]?.message
