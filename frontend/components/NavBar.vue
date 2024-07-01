@@ -17,7 +17,7 @@
                 <li class="flex items-center">
                     <BaseNavLink label="FAQ" to="/faq" />
                 </li>
-                <div v-if="!authenticated" class="flex flex-row px-2">
+                <div v-if="!isAuthenticated" class="flex flex-row px-2">
                     <li>
                         <UButton  class="border-50 " to="/register">
                             Register
@@ -31,7 +31,7 @@
                     </li>
 
                 </div>
-                <div  v-if="authenticated" class="flex flex-row px-2">
+                <div  v-else class="flex flex-row px-2">
                     <li>
                         <UButton  class=" text-sm hover:text-gray-900 transition-colors duration-300"
                             to="/login" variant="link" @click="handleLogout">
@@ -46,14 +46,14 @@
 </template>
 
 <script setup lang="ts">
-import authStore from '~/store/authStore';
 
-const storeAuth = authStore()
-const authenticated = computed(() => storeAuth.isAuthenticated)
+const authStore = useAuthStore()
+const {isAuthenticated} = storeToRefs(authStore)
+
 const activeLink = ref<string>('/')
 
 const handleLogout = () => {
-    storeAuth.logout()
+    authStore.logout()
 }
 const setActiveLink = (route: string) => {
     activeLink.value = route
