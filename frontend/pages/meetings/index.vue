@@ -87,7 +87,8 @@
           <!-- <p class="text-sm text-muted-foreground mt-2">2 external participants</p> -->
         </div>
       </div>
-
+    </div>
+    <div v-if="joinedMeetingStatus === 'success' && joinedMeetingsList.length>0">
       <div v-for="meeting in joinedMeetingsList" class="bg-white rounded-lg shadow-md p-6">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-xl font-semibold">{{ meeting.title }}</h2>
@@ -105,14 +106,14 @@
         <div class="mb-4">
           <p class="text-sm text-muted-foreground"><span class="font-semibold text-md">Room:</span>
             {{ meeting.room.room_name }}</p>
-        </div>
-        <div class="mb-4">
-          <p class="text-md font-semibold mb-2">Participants: {{ meeting.participants.length }}</p>
-          <div class="flex items-center gap-2 flex-wrap max-h-20 overflow-hidden">
-            <div v-for="participant in meeting.participants" class="flex items
-            -center gap-2">
+          </div>
+          <div class="mb-4">
+            <p class="text-md font-semibold mb-2">Participants: {{ meeting.participants.length }}</p>
+            <div class="flex items-center gap-2 flex-wrap max-h-20 overflow-hidden">
+              <div v-for="participant in meeting.participants" class="flex items
+              -center gap-2">
               <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-                <img class="aspect-square h-full w-full" alt="John Doe" src="/placeholder-user.jpg" />
+                <img class="aspect-square h-full w-full" alt="John Doe" src="../../public/placeholder-user.jpg" />
               </span>
               <span class="text-sm">{{ participant.name }}</span>
             </div>
@@ -127,21 +128,21 @@
           <div class="flex items-center gap-2 flex-wrap max-h-20 overflow-hidden">
             <div v-for="externalParticipant in meeting.external_participants" class="flex items
             -center gap-2">
-              <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
-                <img class="aspect-square h-full w-full" alt="Emily Davis" src="/placeholder-user.jpg" />
-              </span>
-              <span class="text-sm">{{ externalParticipant.name }}</span>
-            </div>
+            <span class="relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full">
+              <img class="aspect-square h-full w-full" alt="Emily Davis" src="../../public/placeholder-user.jpg" />
+            </span>
+            <span class="text-sm">{{ externalParticipant.name }}</span>
           </div>
-          <!-- <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-primary underline-offset-4 hover:underline h-10 px-4 py-2 mt-2">
-            Show all
-          </button> -->
-          <!-- <p class="text-sm text-muted-foreground mt-2">2 external participants</p> -->
         </div>
+        <!-- <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-primary underline-offset-4 hover:underline h-10 px-4 py-2 mt-2">
+          Show all
+        </button> -->
+        <!-- <p class="text-sm text-muted-foreground mt-2">2 external participants</p> -->
       </div>
     </div>
-
+    
   </div>
+</div>
 </template>
 <script setup lang="ts">
 import { GetMeetingsForUserDocument, GetRoomsDocument, GetUsersDocument } from '~/gqlGen/types';
