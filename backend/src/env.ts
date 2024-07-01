@@ -21,6 +21,8 @@ const envSchema = z.object({
   HASURA_GRAPHQL_ADMIN_SECRET: z.string(),
   HASURA_GRAPHQL_DATABASE_URL: z.string().url(),
   HASURA_GRAPHQL_SERVER_PORT: z.coerce.number(),
+  PRIVATE_KEY : z.string(),
+  PASSPHRASE : z.string()
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
