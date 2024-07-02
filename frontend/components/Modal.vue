@@ -178,19 +178,19 @@ const getMeetingId =  () => {
   })
   return data
 }
-const getParticipantsBooked =  () => {
-  const { data } =  useAsyncQuery(GetBookedParticipantsDocument, {
-    meeting_id: reservedMeetingID.value
-  })
-  return data
-}
+// const getParticipantsBooked =  () => {
+//   const { data } =  useAsyncQuery(GetBookedParticipantsDocument, {
+//     meeting_id: reservedMeetingID.value
+//   })
+//   return data
+// }
 
-const getReservedRoomId =  () => {
-  const { data } =  useAsyncQuery(GetRoomByMeetingIdDocument, {
-    meeting_id: reservedMeetingID.value
-  })
-  return data
-}
+// const getReservedRoomId =  () => {
+//   const { data } =  useAsyncQuery(GetRoomByMeetingIdDocument, {
+//     meeting_id: reservedMeetingID.value
+//   })
+//   return data
+// }
 
 const getCapacity = () => {
   const { data, status, error, refresh } =  useAsyncQuery(GetRoomsByNameDocument, {
@@ -204,7 +204,6 @@ const authStore = useAuthStore()
 
 const addMeeting = async () => {
   const { mutate, loading, error } = useMutation(AddMeetingDocument)
-  console.log(authStore.user_id)
   const result = await mutate({
     input: {
       title: meeting.value.title,
@@ -255,7 +254,6 @@ const mutateExternalParticipants = async (meeting_id: number | undefined) => {
   return result
 }
 watchEffect(() => {
-  console.log(meeting.value.start_time)
   const usersData =  getUsers()
   if (usersData.value) {
     participants.value = usersData.value.users;
@@ -268,19 +266,9 @@ watchEffect(() => {
   const meetingData =  getMeetingId()
   if (meetingData.value) {
     reservedMeetingID.value = meetingData.value.meeting[0]?.meeting_id
-  }
-  if (reservedMeetingID) {
-    const participantData =  getParticipantsBooked()
-    const reservedRoomID =  getReservedRoomId()
-
-    if (participantData.value) {
-      reservedParticipants.value = participantData.value.participants[0]?.email
-      console.log(reservedParticipants.value)
-    }
-    if (reservedRoomId.value) {
-      reservedRoomId.value = reservedRoomID.value?.room[0].room_id
-      console.log(reservedRoomId.value)
-    } 
+    reservedRoomId.value = meetingData.value.meeting[0]?.meetingroom.room_id
+    reservedParticipants.value = meetingData.value.meeting[0]?.participants
+    console.log(reservedRoomId.value)
   }
 });
 const clearForm = () => {
@@ -323,6 +311,8 @@ const onSubmit = async () => {
     return
   }
   if (reservedMeetingID.value) {
+    console.log(reservedRoomId.value,room_id.value)
+  
     if (room_id.value == reservedRoomId.value) {
       toast.add({
         title: 'The Room is reserved at this time',
@@ -355,7 +345,6 @@ const onSubmit = async () => {
 
     loading.value = true
     const meetingResult = await addMeeting()
-    console.log(meetingResult)
     const meetingID = meetingResult?.data?.meeting?.meeting_id
     const meetings = toRaw(meeting.value.formattedParticipants);
     meetings.forEach(async (meet) => {
