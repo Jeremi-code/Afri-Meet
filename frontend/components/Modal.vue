@@ -266,11 +266,8 @@ watchEffect(() => {
     room_id.value = roomData.value.room[0].room_id
   }
   const meetingData =  getMeetingId()
-  console.log(meetingData.value,'ye')
   if (meetingData.value) {
-    console.log('ermi')
     reservedMeetingID.value = meetingData.value.meeting[0]?.meeting_id
-    console.log(reservedMeetingID.value,'what is happening')
   }
   if (reservedMeetingID) {
     const participantData =  getParticipantsBooked()
@@ -326,34 +323,31 @@ const onSubmit = async () => {
     return
   }
   if (reservedMeetingID.value) {
-    console.log(reservedMeetingID.value)
     if (room_id.value == reservedRoomId.value) {
       toast.add({
         title: 'The Room is reserved at this time',
         color: 'red',
-        icon: "i-heroicons-x-mark",
+        icon: 'i-heroicons-x-mark',
         ui: {
-          backgroundColor: "bg-red-100"
-
-        }
+          backgroundColor: 'bg-red-100',
+        },
       });
-      return
-    } else if (reservedParticipants) {
-      const meetings = toRaw(meeting.value.formattedParticipants)
-      meetings.forEach((meet) => {
+      return;
+    } else if (reservedParticipants.value) {
+      const meetings = meeting.value.formattedParticipants;
+      for (const meet of meetings) {
         if (reservedParticipants.value?.includes(meet.value)) {
           toast.add({
             title: 'Person who is invited to a meeting at the time is included',
             color: 'red',
-            icon: "i-heroicons-x-mark",
+            icon: 'i-heroicons-x-mark',
             ui: {
-              backgroundColor: "bg-red-100"
-
-            }
+              backgroundColor: 'bg-red-100',
+            },
           });
-          return
+          return;
         }
-      })
+      }
     }
   }
 
