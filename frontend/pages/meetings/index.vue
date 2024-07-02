@@ -78,7 +78,7 @@
           <p><span class="font-semibold text-md">Time:</span>{{ meeting.start_time }} - {{ meeting.end_time }}</p>
         </div>
         <p class="text-sm text-muted-foreground"><span class="font-semibold text-md">Room:</span>{{
-          meeting.room.room_name}}</p>
+          meeting.room.room_name }}</p>
         <div class="space-y-2">
           <p class="text-md font-semibold">Participants: {{ meeting.participants.length }}</p>
           <div class="flex items-center gap-2 flex-wrap max-h-20 overflow-hidden">
@@ -169,29 +169,33 @@ const authStore = useAuthStore()
 const { user_email, user_id } = storeToRefs(authStore)
 const user = ref<User>({ user_id: user_id.value!, email: user_email.value!, first_name: "", last_name: "" })
 
-const roomsList = ref<Room[]>([])
-const { data: roomData, status: roomStatus, error: roomError, refresh: refreshRoom } = useAsyncQuery(GetRoomsDocument)
-
-const createdMeetingsList = ref<Meeting[]>([])
-const joinedMeetingsList = ref<Meeting[]>([])
-
-const { data: meetingData, status: meetingStatus, error: meetingError, refresh: refreshMeetings } = useAsyncQuery(GetMeetingsForUserDocument, {
-  user_id: user.value.user_id,
-  email: user.value.email,
+const { data: roomData, status: roomStatus, error: roomError, refresh: refreshRoom , } = await useAsyncQuery(GetRoomsDocument)
+const roomsList = computed<Room[]>(() => {
+  return roomData.value?.rooms ?? []
 })
-const usersList = ref<Users[]>([])
-const { data: usersData, status: usersStatus, error: usersError, refresh: refreshUsers } = useAsyncQuery(GetUsersDocument)
-watchEffect(() => {
-  if (roomData.value) {
-    roomsList.value = toRaw(roomData.value?.rooms)
-  }
 
-  if (usersData.value) {
-    usersList.value = toRaw(usersData.value?.users)
-  }
 
-  if (meetingData.value?.createdMeetings) {
-    createdMeetingsList.value = toRaw(meetingData.value?.createdMeetings).map((meeting: any) => {
+
+const { data: meetingData, status: meetingStatus, error: meetingError, refresh: refreshMeetings } = await useAsyncQuery({
+  query: GetMeetingsForUserDocument, 
+  variables: {
+    user_id: user.value.user_id,
+    email: user.value.email,
+  },
+  cache: false
+});
+// const { data: meetingData, status: meetingStatus, error: meetingError, refresh: refreshMeetings } = useAsyncQuery(GetMeetingsForUserDocument, {
+//     user_id: user.value.user_id,
+//     email: user.value.email,
+// });
+const { data: usersData, status: usersStatus, error: usersError, refresh: refreshUsers } =await useAsyncQuery(GetUsersDocument)
+
+const usersList = computed<Users[]>(() => {
+  return usersData.value?.users ?? []
+})
+
+const createdMeetingsList = computed<Meeting[]>(() => {
+   return meetingData.value?.createdMeetings.map((meeting: any) => {
       let room = roomsList.value.find((room) => room.room_id === meeting.room_id)
       return ({
         ...meeting,
@@ -205,11 +209,10 @@ watchEffect(() => {
           }
         })
       })
-    });
-  }
-
-  if (meetingData.value?.joinedMeetings) {
-    joinedMeetingsList.value = toRaw(meetingData.value?.joinedMeetings).map((meeting: any) => {
+    }) ?? []
+})
+const joinedMeetingsList = computed<Meeting[]>(() => {
+  return meetingData.value?.joinedMeetings.map((meeting: any) => {
       let room = roomsList.value.find((room) => room.room_id === meeting.room_id)
       return ({
         ...meeting,
@@ -223,17 +226,21 @@ watchEffect(() => {
           }
         })
       })
-    });
-  }
+    }) ?? []
 })
-
-onMounted(async () => {
+async function refetchData() {
+  console.log('here')
   loading.value = true
   await refreshMeetings()
+  console.log('ok',)
   await refreshRoom()
   await refreshUsers()
 
   loading.value = false
+}
+
+onMounted(() => {
+  refetchData()
 })
 
 </script>
