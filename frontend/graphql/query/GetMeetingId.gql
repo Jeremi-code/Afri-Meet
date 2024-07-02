@@ -9,6 +9,16 @@ query GetMeetingId($date: date!, $startTime: String!, $endTime: String!) {
       ]
     }
   ) {
-    meeting_id
+    meeting_id,
+    meetingroom {
+      room_id,
+      room_name
+    },
+    participants {
+      email
+    },
+    external_participants {
+      name
+    }
   }
 }
