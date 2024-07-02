@@ -6,6 +6,9 @@ query GetMeetingsForUser($user_id: Int!, $email: String!) {
     start_time
     end_time
     creator
+    meetingroom {
+      room_name
+    }
     room_id
     participants {
       email
@@ -23,6 +26,9 @@ query GetMeetingsForUser($user_id: Int!, $email: String!) {
     start_time
     end_time
     creator
+    meetingroom {
+      room_name
+    }
     room_id
     participants {
       email
