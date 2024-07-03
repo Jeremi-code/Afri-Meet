@@ -72,7 +72,14 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { startOfDay, addMonths, isValid, parse, startOfToday, formatDate } from "date-fns";
+import {
+  startOfDay,
+  addMonths,
+  isValid,
+  parse,
+  startOfToday,
+  formatDate,
+} from "date-fns";
 import type { ResultOf } from "@graphql-typed-document-node/core";
 import z from "zod";
 import {
@@ -95,8 +102,9 @@ type Room = ResultOf<typeof GetRoomByIdDocument>["room"][number];
 const props = defineProps<{
   room: Room;
   participants: Participant[];
-  external_participants: ExternalParticipant[]
-  meeting_id : number
+  external_participants: ExternalParticipant[];
+  meeting_id: number;
+  title : string | null | undefined
 }>();
 const selectedRoom = ref(props.room.room_name);
 interface RescheduleForm {
@@ -152,8 +160,8 @@ const rooms = [
   "Huddle Room",
 ];
 const { mutate, loading, error } = useMutation(RescheduleMeetingDocument);
-console.log(rescheduledMeeting.value.date)
-console.log(rescheduledMeeting.value.start_time)
+console.log(rescheduledMeeting.value.date);
+console.log(rescheduledMeeting.value.start_time);
 
 const sendMeetingEmail = async (
   title: string,
@@ -177,66 +185,96 @@ const sendMeetingEmail = async (
 
 const onSubmit = async () => {
   const { data: meetingData } = useAsyncQuery(GetMeetingIdDocument, {
-  date: rescheduledMeeting.value.date,
-  startTime: rescheduledMeeting.value.start_time,
-  endTime: rescheduledMeeting.value.end_time,
-});
-const { data: roomData } = useAsyncQuery(GetRoomsByNameDocument, {
-  name: rescheduledMeeting.value.room,
-});
+    date: rescheduledMeeting.value.date,
+    startTime: rescheduledMeeting.value.start_time,
+    endTime: rescheduledMeeting.value.end_time,
+  });
+  const { data: roomData } = useAsyncQuery(GetRoomsByNameDocument, {
+    name: rescheduledMeeting.value.room,
+  });
 
-
-const room_id = computed(() => roomData.value?.room[0].room_id);
-const capacity = computed(() => roomData.value?.room[0].capacity);
-const reservedMeetings = computed(() => meetingData.value?.meeting);
-  console.log(room_id.value)
-  console.log(rescheduledMeeting.value.start_time)
-  const currentTime = getCurrentMilitaryTime().split(':')
-  const currentDate = formatDate(new Date(),'yyyy-MM-dd')
-  const normalizedStartedTime = rescheduledMeeting.value.start_time.split(':')
-  const normalizedEndTime = rescheduledMeeting.value.end_time.split(':')
-  console.log(reservedMeetings.value)
+  const room_id = computed(() => roomData.value?.room[0].room_id);
+  const capacity = computed(() => roomData.value?.room[0].capacity);
+  const reservedMeetings = computed(() => meetingData.value?.meeting);
+  const currentTime = getCurrentMilitaryTime().split(":");
+  const currentDate = formatDate(new Date(), "yyyy-MM-dd");
+  const normalizedStartedTime = rescheduledMeeting.value.start_time.split(":");
+  const normalizedEndTime = rescheduledMeeting.value.end_time.split(":");
+  console.log(reservedMeetings.value);
   if (normalizedEndTime[0] <= normalizedStartedTime[0]) {
-    if ((parseInt(normalizedEndTime[1]) - parseInt(normalizedStartedTime[1]) < 10) || (parseInt(normalizedEndTime[0]) < parseInt(normalizedStartedTime[0]))) {
-      useCustomToast('end time and start time must have at least a 10 min difference',"error")
-      return
+    if (
+      parseInt(normalizedEndTime[1]) - parseInt(normalizedStartedTime[1]) <
+        10 ||
+      parseInt(normalizedEndTime[0]) < parseInt(normalizedStartedTime[0])
+    ) {
+      useCustomToast(
+        "end time and start time must have at least a 10 min difference",
+        "error"
+      );
+      return;
     }
-  } if (rescheduledMeeting.value.date == currentDate && (currentTime[0] > normalizedStartedTime[0] || (currentTime[0] == normalizedStartedTime[0] && currentTime[1] < normalizedStartedTime[1]))) {
-    useCustomToast('Time has already passed','error')
-    return
   }
-  if (capacity.value! < toRaw(props.participants.length) + toRaw(props.external_participants.length)) {
-    console.log(props.participants.length + props.external_participants.length )
-    console.log(props.participants)
-    useCustomToast('Room does not have the capacity for this meeting','error')
-    return
+  if (
+    rescheduledMeeting.value.date == currentDate &&
+    (currentTime[0] > normalizedStartedTime[0] ||
+      (currentTime[0] == normalizedStartedTime[0] &&
+        currentTime[1] < normalizedStartedTime[1]))
+  ) {
+    useCustomToast("Time has already passed", "error");
+    return;
   }
-  if (reservedMeetings.value ) {
+  if (
+    capacity.value! <
+    toRaw(props.participants.length) + toRaw(props.external_participants.length)
+  ) {
+    console.log(props.participants.length + props.external_participants.length);
+    console.log(props.participants);
+    useCustomToast("Room does not have the capacity for this meeting", "error");
+    return;
+  }
+  if (reservedMeetings.value) {
     const filterMeetings = reservedMeetings.value!.filter((meeting) => {
-      return props.meeting_id !== meeting.meeting_id
-    })
+      return props.meeting_id !== meeting.meeting_id;
+    });
     const reservedRoomList = filterMeetings.map((meeting) => {
-      return meeting.meetingroom.room_id 
-    })
+      return meeting.meetingroom.room_id;
+    });
     const reservedParticipantsList = filterMeetings.flatMap((meeting) => {
       return meeting.participants.map((participant) => {
-        return participant.email
-      })
-    })
+        return participant.email;
+      });
+    });
     if (toRaw(reservedRoomList.includes(room_id.value!))) {
-      useCustomToast('The Room is reserved at this time','error')
+      useCustomToast("The Room is reserved at this time", "error");
       return;
     }
     if (reservedParticipantsList) {
       const participants = props.participants;
       for (const participant of participants) {
         if (reservedParticipantsList.includes(participant.email)) {
-          useCustomToast('Person who is invivted to a meeting at the time is included','error')
+          useCustomToast(
+            "Person who is invivted to a meeting at the time is included",
+            "error"
+          );
           return;
         }
       }
     }
   }
-}
-
+  try {
+    await mutate({
+      meeting_id : props.meeting_id,
+      date : rescheduledMeeting.value.date,
+      start_time : rescheduledMeeting.value.start_time,
+      end_time : rescheduledMeeting.value.end_time,
+      room_id : room_id.value
+    })
+    for (const participant of props.participants) {
+      await sendMeetingEmail(props.title!,participant.email,rescheduledMeeting.value.date,rescheduledMeeting.value.start_time,rescheduledMeeting.value.end_time)
+    }
+  } catch (error) {
+    console.log(error)
+    useCustomToast('Error updating a meeting','error')
+  }
+};
 </script>
