@@ -1,0 +1,20 @@
+mutation RescheduleMeeting(
+  $meeting_id: Int!
+  $date: date!
+  $start_time: String!
+  $end_time: String!
+) {
+  update_afrimeet_meetings_by_pk(
+    pk_columns: { meeting_id: $meeting_id }
+    _set: { date: $date, start_time: $start_time, end_time: $end_time }
+  ) {
+    meeting_id
+    date
+    start_time
+    end_time
+    room_id
+    meetingroom {
+      room_name
+    }
+  }
+}
