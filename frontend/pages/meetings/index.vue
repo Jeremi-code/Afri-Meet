@@ -99,6 +99,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { formatDate } from 'date-fns';
 import { DeleteMeetingDocument, GetMeetingsForUserDocument, GetRoomsDocument, GetUsersDocument } from '~/gqlGen/types';
 
 definePageMeta({
@@ -165,12 +166,13 @@ const deleteMeeting = async (meeting_id:number) => {
   })
   meetingData.value!.createdMeetings = meetingData.value!.createdMeetings.filter((meeting) => meeting.meeting_id != meeting_id)
 }
-
+const currentDate = computed(() => formatDate(new Date(),'yyyy-MM-dd'))
 const { data: meetingData, status: meetingStatus, error: meetingError, refresh: refreshMeetings } = await useAsyncQuery({
   query: GetMeetingsForUserDocument, 
   variables: {
     user_id: user.value.user_id,
     email: user.value.email,
+    date: currentDate.value
   },
   cache: false
 });
