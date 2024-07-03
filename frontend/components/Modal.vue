@@ -237,6 +237,18 @@ const clearForm = () => {
 }
 
 const onSubmit = async () => {
+  const validatedData = meetingForm.safeParse({
+      title: meeting.value.title,
+      room: meeting.value.room,
+      date: meeting.value.date,
+      start_time: meeting.value.start_time,
+      end_time: meeting.value.end_time,
+      formattedParticipants: meeting.value.formattedParticipants,
+      externalParticipants: meeting.value.externalParticipants,
+    });
+  if (!validatedData.success) {
+    return
+  }
   const currentTime = getCurrentMilitaryTime().split(':')
   const currentDate = formatDate(new Date(),'yyyy-MM-dd')
   const normalizedStartedTime = meeting.value.start_time.split(':')
