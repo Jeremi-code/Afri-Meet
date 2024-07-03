@@ -23,10 +23,7 @@
         <div class="flex items-center justify-between">
           <h2 class="text-xl font-semibold">{{ createdMeeting.title }}</h2>
           <div class="flex items-center gap-2">
-            <button
-              class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3">
-              Reschedule
-            </button>
+            <RescheduleModal :room="createdMeeting.room" :participants="createdMeeting.participants" :external_participants="createdMeeting.external_participants" :meeting_id="createdMeeting.meeting_id"/>
             <button @click="deleteMeeting(createdMeeting.meeting_id)"
               class="bg-red-500 text-white hover:bg-red-600 inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-9 rounded-md px-3">
               Cancel
@@ -100,6 +97,7 @@
 </template>
 <script setup lang="ts">
 import { formatDate } from 'date-fns';
+import RescheduleModal from '~/components/RescheduleModal.vue';
 import { DeleteMeetingDocument, GetMeetingsForUserDocument, GetRoomsDocument, GetUsersDocument } from '~/gqlGen/types';
 
 definePageMeta({
@@ -199,6 +197,7 @@ const createdMeetingsList = computed<Meeting[]>(() => {
       })
     }) ?? []
 })
+console.log(createdMeetingsList.value)
 const joinedMeetingsList = computed<Meeting[]>(() => {
   return meetingData.value?.joinedMeetings.map((meeting: any) => {
       let room = roomsList.value.find((room) => room.room_id === meeting.room_id)
