@@ -1,0 +1,11 @@
+mutation DeleteMeeting($meeting_id : Int!) {
+ deletedParticipants: delete_afrimeet_participants(where: {meeting_id : { _eq : $meeting_id}}) {
+    affected_rows
+    }
+   deletedExternalParticipants: delete_afrimeet_external_participants(where: {meeting_id : {_eq : $meeting_id}}) {
+        affected_rows
+    } 
+    deletedMeetings:delete_afrimeet_meetings(where : {meeting_id : {_eq : $meeting_id}}) {
+        affected_rows
+    }
+}
