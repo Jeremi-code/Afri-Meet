@@ -27,7 +27,7 @@
               class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3">
               Reschedule
             </button>
-            <button
+            <button @click="deleteMeeting(createdMeeting.meeting_id)"
               class="bg-red-500 text-white hover:bg-red-600 inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-9 rounded-md px-3">
               Cancel
             </button>
@@ -115,7 +115,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { GetMeetingsForUserDocument, GetRoomsDocument, GetUsersDocument } from '~/gqlGen/types';
+import { DeleteMeetingDocument, GetMeetingsForUserDocument, GetRoomsDocument, GetUsersDocument } from '~/gqlGen/types';
 
 definePageMeta({
   middleware: 'auth'
@@ -174,7 +174,13 @@ const roomsList = computed<Room[]>(() => {
   return roomData.value?.rooms ?? []
 })
 
-
+const { mutate } = useMutation(DeleteMeetingDocument)
+const deleteMeeting = async (meeting_id:number) => {
+  await mutate({
+   meeting_id
+  })
+  meetingData.value!.createdMeetings = meetingData.value!.createdMeetings.filter((meeting) => meeting.meeting_id != meeting_id)
+}
 
 const { data: meetingData, status: meetingStatus, error: meetingError, refresh: refreshMeetings } = await useAsyncQuery({
   query: GetMeetingsForUserDocument, 
