@@ -93,7 +93,7 @@ import type { ResultOf } from '@graphql-typed-document-node/core';
 import { GetUsersDocument, GetRoomByIdDocument, GetRoomsByNameDocument, AddExternalParticipantDocument, AddMeetingDocument, AddParticipantDocument, SendEmailDocument, GetMeetingIdDocument, GetBookedParticipantsDocument, GetRoomByMeetingIdDocument } from '~/gqlGen/types';
 import { ref, computed, watchEffect } from 'vue';
 import z from 'zod';
-import { isBefore, isValid, isAfter, addMonths, parse, startOfDay, addDays, addMinutes } from 'date-fns';
+import { isBefore, isValid, isAfter, addMonths, parse, startOfDay, addDays, addMinutes, formatDate } from 'date-fns';
 import type { RefSymbol } from '@vue/reactivity';
 
 interface ReservationForm {
@@ -237,108 +237,67 @@ const clearForm = () => {
 }
 
 const onSubmit = async () => {
-  console.log(reservedMeetingID.value)
+  const currentTime = getCurrentMilitaryTime().split(':')
+  const currentDate = formatDate(new Date(),'yyyy-MM-dd')
   const normalizedStartedTime = meeting.value.start_time.split(':')
   const normalizedEndTime = meeting.value.end_time.split(':')
   if (normalizedEndTime[0] <= normalizedStartedTime[0]) {
     if ((parseInt(normalizedEndTime[1]) - parseInt(normalizedStartedTime[1]) < 10) || (parseInt(normalizedEndTime[0]) < parseInt(normalizedStartedTime[0]))) {
-      toast.add({
-        title: 'end time and start time must have at least a 10 min difference',
-        color: 'red',
-        icon: "i-heroicons-x-mark",
-        ui: {
-          backgroundColor: "bg-red-100"
-
-        }
-      });
+      useCustomToast('end time and start time must have at least a 10 min difference',"error")
       return
     }
+  } if (meeting.value.date == currentDate && (currentTime[0] > normalizedStartedTime[0] || (currentTime[0] == normalizedStartedTime[0] && currentTime[1] < normalizedStartedTime[1]))) {
+    useCustomToast('Time has already passed','error')
+    return
   }
   if (capacity.value! < toRaw(meeting.value.formattedParticipants.length) + toRaw(meeting.value.externalParticipants.length)) {
-    toast.add({
-      title: 'Room does not have the capacity for this meeting',
-      color: 'red',
-      icon: "i-heroicons-x-mark",
-      ui: {
-        backgroundColor: "bg-red-100"
-
-      }
-    });
+    useCustomToast('Room does not have the capacity for this meeting','error')
     return
   }
   if (reservedMeetings.value) {
-    const reservedRoomList = reservedMeetings.value.map((meeting) => {
+    const reservedRoomList = reservedMeetings.value!.map((meeting) => {
       return meeting.meetingroom.room_id
     })
-    const reservedParticipantsList = reservedMeetings.value.flatMap((meeting) => {
+    const reservedParticipantsList = reservedMeetings.value!.flatMap((meeting) => {
       return meeting.participants.map((participant) => {
         return participant.email
       })
     })
     if (toRaw(reservedRoomList.includes(room_id.value!))) {
-      toast.add({
-        title: 'The Room is reserved at this time',
-        color: 'red',
-        icon: 'i-heroicons-x-mark',
-        ui: {
-          backgroundColor: 'bg-red-100',
-        },
-      });
+      useCustomToast('The Room is reserved at this time','error')
       return;
     }
-    else if (reservedParticipantsList) {
+    if (reservedParticipantsList) {
       const meetings = meeting.value.formattedParticipants;
       for (const meet of meetings) {
         if (reservedParticipantsList.includes(meet.value)) {
-          toast.add({
-            title: 'Person who is invited to a meeting at the time is included',
-            color: 'red',
-            icon: 'i-heroicons-x-mark',
-            ui: {
-              backgroundColor: 'bg-red-100',
-            },
-          });
+          useCustomToast('Person who is invivted to a meeting at the time is included','error')
           return;
         }
       }
     }
   }
+  try {
+    loading.value = true
+    const meetingResult = await addMeeting()
+    const meetingID = meetingResult?.data?.meeting?.meeting_id
+    const meetings = toRaw(meeting.value.formattedParticipants);
+    meetings.forEach(async (meet) => {
+      await addParticipant(meetingID, meet.value)
+      await sendMeetingEmail(meeting.value.title, meet.value, meeting.value.date, meeting.value.start_time, meeting.value.end_time)
+    })
+    await mutateExternalParticipants(meetingID)
+    clearForm()
+    useCustomToast('meeting added successfully','ok')
+  } catch (error: any) {
+    console.log(error.toString())
+    useCustomToast('error on adding a meeting','error')
+  } finally {
+    loading.value = false
+    isOpen.value = false
+  }
 }
 
-try {
-
-  loading.value = true
-  const meetingResult = await addMeeting()
-  const meetingID = meetingResult?.data?.meeting?.meeting_id
-  const meetings = toRaw(meeting.value.formattedParticipants);
-  meetings.forEach(async (meet) => {
-    await addParticipant(meetingID, meet.value)
-    await sendMeetingEmail(meeting.value.title, meet.value, meeting.value.date, meeting.value.start_time, meeting.value.end_time)
-  })
-  await mutateExternalParticipants(meetingID)
-  clearForm()
-  toast.add({
-    title: 'meeting added successfully',
-    color: 'green',
-    icon: 'i-heroicons-check-circle',
-    ui: {
-      backgroundColor: 'green'
-    }
-  })
-} catch (error: any) {
-  console.log(error.toString())
-  toast.add({
-    title: 'Error on Adding meeting ',
-    color: 'red',
-    icon: 'i-heroicons-x-mark',
-    ui: {
-      backgroundColor: "bg-red-100"
-    }
-  })
-} finally {
-  loading.value = false
-  isOpen.value = false
-}
 
 
 const rooms = ['Conference Room A', 'Boardroom', 'Executive Suite', 'Huddle Room'];
