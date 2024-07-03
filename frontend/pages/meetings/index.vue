@@ -49,10 +49,6 @@
             <span class="text-sm">{{ participant.name }}</span>
           </div>
         </div>
-        <!-- <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-primary underline-offset-4 hover:underline h-10 px-4 py-2 mt-2">
-          Show all
-        </button> -->
-        <!-- <p class=" mt-2">{{createdMeeting.participants.length}} participants</p> -->
         <div>
           <p class="text-md font-semibold mb-2">External Participants: {{ createdMeeting.external_participants.length
             }}</p>
@@ -65,10 +61,6 @@
               <span class="text-sm">{{ externalParticipant.name }}</span>
             </div>
           </div>
-          <!-- <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-primary underline-offset-4 hover:underline h-10 px-4 py-2 mt-2">
-          Show all
-        </button> -->
-          <!-- <p class="text-sm text-muted-foreground mt-2">2 external participants</p> -->
         </div>
       </div>
       <div v-for="meeting in joinedMeetingsList" class="bg-white rounded-lg shadow-md p-4 md:p-6 space-y-4">
@@ -89,10 +81,6 @@
               <span class="text-sm">{{ participant.name }}</span>
             </div>
           </div>
-          <!-- <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-primary underline-offset-4 hover:underline h-10 px-4 py-2 mt-2">
-          Show all
-        </button> -->
-          <!-- <p class="text-sm text-muted-foreground mt-2">{{meeting.participants.length}} participants</p> -->
         </div>
         <div class="">
           <p class="text-md font-semibold mb-2">External Participants: {{ meeting.external_participants.length }}</p>
@@ -104,10 +92,6 @@
               <span class="text-sm">{{ externalParticipant.name }}</span>
             </div>
           </div>
-          <!-- <button class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-primary underline-offset-4 hover:underline h-10 px-4 py-2 mt-2">
-        Show all
-      </button> -->
-          <!-- <p class="text-sm text-muted-foreground mt-2">2 external participants</p> -->
         </div>
       </div>
     </div>
@@ -190,10 +174,6 @@ const { data: meetingData, status: meetingStatus, error: meetingError, refresh: 
   },
   cache: false
 });
-// const { data: meetingData, status: meetingStatus, error: meetingError, refresh: refreshMeetings } = useAsyncQuery(GetMeetingsForUserDocument, {
-//     user_id: user.value.user_id,
-//     email: user.value.email,
-// });
 const { data: usersData, status: usersStatus, error: usersError, refresh: refreshUsers } =await useAsyncQuery(GetUsersDocument)
 
 const usersList = computed<Users[]>(() => {
