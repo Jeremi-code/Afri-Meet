@@ -109,6 +109,7 @@ interface ReservationForm {
 type Room = ResultOf<typeof GetRoomByIdDocument>['room'][number];
 type RoomID = ResultOf<typeof GetRoomByMeetingIdDocument>['room'][number]
 type ReservedParticipants = ResultOf<typeof GetBookedParticipantsDocument>['participants']
+type ReservedMeetings = ResultOf<typeof GetMeetingIdDocument>['meeting']
 const props = defineProps<{
   room: Room;
 }>();
@@ -157,49 +158,21 @@ const isOpen = ref(false);
 const addExternalParticipants = ref(false);
 const loading = ref(false)
 const toast = useToast()
-const participants = ref<Participants[] | null>(null);
-const selectedParticipants = ref<Participants[] | null>(null)
-const capacity = ref(props.room.capacity)
-const room_id = ref(props.room.room_id)
 const reservedMeetingID = ref(0)
-const reservedParticipants = ref<ReservedParticipants | string | null | undefined>([])
-const reservedRoomId = ref<RoomID | number>()
 
-const getUsers =  () => {
-  const { data } =  useAsyncQuery(GetUsersDocument)
-  return data
-}
-
-const getMeetingId =  () => {
-  const { data } =  useAsyncQuery(GetMeetingIdDocument, {
-    date: meeting.value.date,
-    startTime: meeting.value.start_time,
-    endTime: meeting.value.end_time
-  })
-  return data
-}
-// const getParticipantsBooked =  () => {
-//   const { data } =  useAsyncQuery(GetBookedParticipantsDocument, {
-//     meeting_id: reservedMeetingID.value
-//   })
-//   return data
-// }
-
-// const getReservedRoomId =  () => {
-//   const { data } =  useAsyncQuery(GetRoomByMeetingIdDocument, {
-//     meeting_id: reservedMeetingID.value
-//   })
-//   return data
-// }
-
-const getCapacity = () => {
-  const { data, status, error, refresh } =  useAsyncQuery(GetRoomsByNameDocument, {
-    name: meeting.value.room
-  })
-
-  return data
-}
-
+const { data: usersData } = useAsyncQuery(GetUsersDocument)
+const { data: meetingData } = useAsyncQuery(GetMeetingIdDocument, {
+  date: meeting.value.date,
+  startTime: meeting.value.start_time,
+  endTime: meeting.value.end_time
+})
+const { data: roomData } = useAsyncQuery(GetRoomsByNameDocument, {
+  name: meeting.value.room
+})
+const reservedMeetings = computed(() => meetingData.value?.meeting)
+const participants = computed(() => usersData.value?.users)
+const room_id = computed(() => roomData.value?.room[0].room_id)
+const capacity = computed(() => roomData.value?.room[0].capacity)
 const authStore = useAuthStore()
 
 const addMeeting = async () => {
@@ -253,24 +226,7 @@ const mutateExternalParticipants = async (meeting_id: number | undefined) => {
   })
   return result
 }
-watchEffect(() => {
-  const usersData =  getUsers()
-  if (usersData.value) {
-    participants.value = usersData.value.users;
-  }
-  const roomData =  getCapacity()
-  if (roomData.value) {
-    capacity.value = roomData.value.room[0].capacity
-    room_id.value = roomData.value.room[0].room_id
-  }
-  const meetingData =  getMeetingId()
-  if (meetingData.value) {
-    reservedMeetingID.value = meetingData.value.meeting[0]?.meeting_id
-    reservedRoomId.value = meetingData.value.meeting[0]?.meetingroom.room_id
-    reservedParticipants.value = meetingData.value.meeting[0]?.participants
-    console.log(reservedRoomId.value)
-  }
-});
+
 const clearForm = () => {
   meeting.value.date = ''
   meeting.value.title = ''
@@ -298,7 +254,7 @@ const onSubmit = async () => {
       return
     }
   }
-  if (capacity.value < toRaw(meeting.value.formattedParticipants.length) + toRaw(meeting.value.externalParticipants.length)) {
+  if (capacity.value! < toRaw(meeting.value.formattedParticipants.length) + toRaw(meeting.value.externalParticipants.length)) {
     toast.add({
       title: 'Room does not have the capacity for this meeting',
       color: 'red',
@@ -310,10 +266,16 @@ const onSubmit = async () => {
     });
     return
   }
-  if (reservedMeetingID.value) {
-    console.log(reservedRoomId.value,room_id.value)
-  
-    if (room_id.value == reservedRoomId.value) {
+  if (reservedMeetings.value) {
+    const reservedRoomList = reservedMeetings.value.map((meeting) => {
+      return meeting.meetingroom.room_id
+    })
+    const reservedParticipantsList = reservedMeetings.value.flatMap((meeting) => {
+      return meeting.participants.map((participant) => {
+        return participant.email
+      })
+    })
+    if (toRaw(reservedRoomList.includes(room_id.value!))) {
       toast.add({
         title: 'The Room is reserved at this time',
         color: 'red',
@@ -323,10 +285,11 @@ const onSubmit = async () => {
         },
       });
       return;
-    } else if (reservedParticipants.value) {
+    }
+    else if (reservedParticipantsList) {
       const meetings = meeting.value.formattedParticipants;
       for (const meet of meetings) {
-        if (reservedParticipants.value?.includes(meet.value)) {
+        if (reservedParticipantsList.includes(meet.value)) {
           toast.add({
             title: 'Person who is invited to a meeting at the time is included',
             color: 'red',
@@ -340,42 +303,44 @@ const onSubmit = async () => {
       }
     }
   }
-
-  try {
-
-    loading.value = true
-    const meetingResult = await addMeeting()
-    const meetingID = meetingResult?.data?.meeting?.meeting_id
-    const meetings = toRaw(meeting.value.formattedParticipants);
-    meetings.forEach(async (meet) => {
-      await addParticipant(meetingID, meet.value)
-      await sendMeetingEmail(meeting.value.title, meet.value, meeting.value.date, meeting.value.start_time, meeting.value.end_time)
-    })
-    await mutateExternalParticipants(meetingID)
-    clearForm()
-    toast.add({
-      title: 'meeting added successfully',
-      color: 'green',
-      icon: 'i-heroicons-check-circle',
-      ui: {
-        backgroundColor: 'green'
-      }
-    })
-  } catch (error) {
-    toast.add({
-      title: 'Error on Adding meeting ',
-      color: 'red',
-      icon: 'i-heroicons-x-mark',
-      ui: {
-        backgroundColor: "bg-red-100"
-      }
-    })
-  } finally {
-    loading.value = false
-    isOpen.value = false
-  }
-
 }
+
+try {
+
+  loading.value = true
+  const meetingResult = await addMeeting()
+  const meetingID = meetingResult?.data?.meeting?.meeting_id
+  const meetings = toRaw(meeting.value.formattedParticipants);
+  meetings.forEach(async (meet) => {
+    await addParticipant(meetingID, meet.value)
+    await sendMeetingEmail(meeting.value.title, meet.value, meeting.value.date, meeting.value.start_time, meeting.value.end_time)
+  })
+  await mutateExternalParticipants(meetingID)
+  clearForm()
+  toast.add({
+    title: 'meeting added successfully',
+    color: 'green',
+    icon: 'i-heroicons-check-circle',
+    ui: {
+      backgroundColor: 'green'
+    }
+  })
+} catch (error: any) {
+  console.log(error.toString())
+  toast.add({
+    title: 'Error on Adding meeting ',
+    color: 'red',
+    icon: 'i-heroicons-x-mark',
+    ui: {
+      backgroundColor: "bg-red-100"
+    }
+  })
+} finally {
+  loading.value = false
+  isOpen.value = false
+}
+
+
 const rooms = ['Conference Room A', 'Boardroom', 'Executive Suite', 'Huddle Room'];
 
 const formattedParticipants = computed(() =>
