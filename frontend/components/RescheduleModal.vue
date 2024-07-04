@@ -33,7 +33,7 @@
           class="space-y-4"
           :schema="meetingForm"
           :state="rescheduledMeeting"
-          @submit.prevent="onSubmit"
+          @submit="onSubmit"
         >
           <UFormGroup label="Room" name="room">
             <UInputMenu
@@ -64,7 +64,7 @@
             />
           </UFormGroup>
           <div class="flex justify-end mt-4">
-            <UButton label="Save" type="submit" @click="onSubmit" />
+            <UButton label="Save" type="submit" />
           </div>
         </UForm>
       </UCard>
@@ -104,7 +104,7 @@ const props = defineProps<{
   participants: Participant[];
   external_participants: ExternalParticipant[];
   meeting_id: number;
-  title : string | null | undefined
+  title: string | null | undefined;
 }>();
 const selectedRoom = ref(props.room.room_name);
 interface RescheduleForm {
@@ -120,7 +120,7 @@ const rescheduledMeeting = ref<RescheduleForm>({
   end_time: "",
 });
 
-const emit = defineEmits(['updateMeeting'])
+const emit = defineEmits(["updateMeeting"]);
 
 const parseDate = (dateStr: string) => {
   return startOfDay(parse(dateStr, "yyyy-MM-dd", new Date()));
@@ -185,16 +185,14 @@ const sendMeetingEmail = async (
   return result;
 };
 
+const clearForm = () => {
+  rescheduledMeeting.value.date = ''
+  rescheduledMeeting.value.end_time = ''
+  rescheduledMeeting.value.start_time = ''
+  rescheduledMeeting.value.room = ''
+}
+
 const onSubmit = async () => {
-  const validatedData = meetingForm.safeParse({
-      room: rescheduledMeeting.value.room,
-      date: rescheduledMeeting.value.date,
-      start_time: rescheduledMeeting.value.start_time,
-      end_time: rescheduledMeeting.value.end_time,
-    });
-  if (!validatedData.success) {
-    return
-  }
   const { data: meetingData } = useAsyncQuery(GetMeetingIdDocument, {
     date: rescheduledMeeting.value.date,
     startTime: rescheduledMeeting.value.start_time,
@@ -204,8 +202,12 @@ const onSubmit = async () => {
     name: rescheduledMeeting.value.room,
   });
 
-  const room_id = computed(() => roomData.value?.room[0].room_id || props.room.room_id);
-  const capacity = computed(() => roomData.value?.room[0].capacity || props.room.capacity);
+  const room_id = computed(
+    () => roomData.value?.room[0].room_id || props.room.room_id
+  );
+  const capacity = computed(
+    () => roomData.value?.room[0].capacity || props.room.capacity
+  );
   const reservedMeetings = computed(() => meetingData.value?.meeting);
   const currentTime = getCurrentMilitaryTime().split(":");
   const currentDate = formatDate(new Date(), "yyyy-MM-dd");
@@ -270,22 +272,30 @@ const onSubmit = async () => {
       }
     }
   }
-  console.log(room_id.value)
   try {
     await mutate({
-      meeting_id : props.meeting_id,
-      date : rescheduledMeeting.value.date,
-      start_time : rescheduledMeeting.value.start_time,
-      end_time : rescheduledMeeting.value.end_time,
-      room_id : room_id.value
-    })
+      meeting_id: props.meeting_id,
+      date: rescheduledMeeting.value.date,
+      start_time: rescheduledMeeting.value.start_time,
+      end_time: rescheduledMeeting.value.end_time,
+      room_id: room_id.value,
+    });
     for (const participant of props.participants) {
-      await sendMeetingEmail(props.title!,participant.email,rescheduledMeeting.value.date,rescheduledMeeting.value.start_time,rescheduledMeeting.value.end_time)
+      await sendMeetingEmail(
+        props.title!,
+        participant.email,
+        rescheduledMeeting.value.date,
+        rescheduledMeeting.value.start_time,
+        rescheduledMeeting.value.end_time
+      );
     }
-    emit('updateMeeting')
+    useCustomToast('Meeting has been rescheduled successfully','ok')
+    clearForm()
+    isOpen.value = false
+    emit("updateMeeting");
   } catch (error) {
-    console.log(error)
-    useCustomToast('Error updating a meeting','error')
+    console.log(error);
+    useCustomToast("Error updating a meeting", "error");
   }
 };
 </script>
