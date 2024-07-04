@@ -15,7 +15,7 @@
           </div>
         </template>
 
-        <UForm class="space-y-4" :schema="meetingForm" :state="meeting" @submit="onSubmit">
+        <UForm class="space-y-4" :schema="meetingForm" :state="meeting" @submit="onSubmit" @error="onError">
           <UFormGroup label="Meeting Title" name="title">
             <UInput v-model="meeting.title" id="title" />
           </UFormGroup>
@@ -76,7 +76,7 @@
             </div>
           </UFormGroup>
           <div class="flex justify-end mt-4">
-            <UButton label="Save" type="submit" @click="onSubmit" />
+            <UButton label="Save" type="submit"  />
           </div>
         </UForm>
       </UCard>
@@ -90,6 +90,7 @@
 </template>
 
 <script setup lang="ts">
+import type { FormSubmitEvent, FormErrorEvent} from '#ui/types'
 import type { ResultOf } from '@graphql-typed-document-node/core';
 import { GetUsersDocument, GetRoomByIdDocument, GetRoomsByNameDocument, AddExternalParticipantDocument, AddMeetingDocument, AddParticipantDocument, SendEmailDocument, GetMeetingIdDocument, GetBookedParticipantsDocument, GetRoomByMeetingIdDocument } from '~/gqlGen/types';
 import { ref, computed, watchEffect } from 'vue';
@@ -114,6 +115,11 @@ type ReservedMeetings = ResultOf<typeof GetMeetingIdDocument>['meeting']
 const props = defineProps<{
   room: Room;
 }>();
+
+const onError = (event: FormErrorEvent) => {
+  console.log("error", event)
+
+}
 
 const selectedRoom = ref(props.room.room_name);
 const meeting = ref<ReservationForm>({
@@ -242,18 +248,7 @@ const clearForm = () => {
 }
 
 const onSubmit = async () => {
-  const validatedData = meetingForm.safeParse({
-      title: meeting.value.title,
-      room: meeting.value.room,
-      date: meeting.value.date,
-      start_time: meeting.value.start_time,
-      end_time: meeting.value.end_time,
-      formattedParticipants: meeting.value.formattedParticipants,
-      externalParticipants: meeting.value.externalParticipants,
-    });
-  if (!validatedData.success) {
-    return
-  }
+
   const currentTime = getCurrentMilitaryTime().split(':')
   const currentDate = formatDate(new Date(),'yyyy-MM-dd')
   const normalizedStartedTime = meeting.value.start_time.split(':')
