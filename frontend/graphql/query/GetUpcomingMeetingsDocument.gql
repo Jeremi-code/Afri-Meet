@@ -25,5 +25,6 @@ query GetUpcomingMeetings($room_id: Int!, $current_time: String!, $date: date!) 
     start_time
     end_time
     creator
+    date
   }
 }
