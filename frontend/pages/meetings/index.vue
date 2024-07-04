@@ -9,7 +9,7 @@
           d="M4 12a8 8 0 018-8V4a10 10 0 00-10 10h2zm2 8a8 8 0 018-8h2a10 10 0 00-10 10v-2z"></path>
       </svg>
     </div>
-    <div v-else-if="meetingStatus === 'error'" class="text-red-500">
+    <div v-else-if="meetingError" class="text-red-500">
       {{ meetingError }}
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
@@ -146,7 +146,7 @@ interface Users {
   first_name: string,
   last_name: string,
 }
-const loading = ref(true)
+// const loading = ref(true)
 
 const authStore = useAuthStore()
 const { user_email, user_id } = storeToRefs(authStore)
@@ -156,26 +156,25 @@ const { data: roomData, status: roomStatus, error: roomError, refresh: refreshRo
 const roomsList = computed<Room[]>(() => {
   return roomData.value?.rooms ?? []
 })
-const refreshPage = () => {
-  window.location.reload()
+const refreshPage = async () => {
+  await refreshMeetings()
 }
+const currentDate = computed(() => formatDate(new Date(),'yyyy-MM-dd'))
+const { result: meetingData, loading, error: meetingError, refetch: refreshMeetings } = useQuery(GetMeetingsForUserDocument, {
+    user_id: user.value.user_id,
+    email: user.value.email,
+    date: currentDate.value
+  ,
+  fetchPolicy: 'no-cache'
+});
 const { mutate } = useMutation(DeleteMeetingDocument)
 const deleteMeeting = async (meeting_id:number) => {
   await mutate({
    meeting_id
   })
-  meetingData.value!.createdMeetings = meetingData.value!.createdMeetings.filter((meeting) => meeting.meeting_id != meeting_id)
+  await refreshMeetings()
+  // meetingData.value!.createdMeetings = meetingData.value!.createdMeetings.filter((meeting) => meeting.meeting_id != meeting_id)
 }
-const currentDate = computed(() => formatDate(new Date(),'yyyy-MM-dd'))
-const { data: meetingData, status: meetingStatus, error: meetingError, refresh: refreshMeetings } = await useAsyncQuery({
-  query: GetMeetingsForUserDocument, 
-  variables: {
-    user_id: user.value.user_id,
-    email: user.value.email,
-    date: currentDate.value
-  },
-  cache: false
-});
 const { data: usersData, status: usersStatus, error: usersError, refresh: refreshUsers } =await useAsyncQuery(GetUsersDocument)
 
 const usersList = computed<Users[]>(() => {
@@ -218,10 +217,8 @@ const joinedMeetingsList = computed<Meeting[]>(() => {
     }) ?? []
 })
 async function refetchData() {
-  console.log('here')
   loading.value = true
   await refreshMeetings()
-  console.log('ok',)
   await refreshRoom()
   await refreshUsers()
 
