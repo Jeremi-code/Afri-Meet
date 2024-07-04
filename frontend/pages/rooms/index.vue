@@ -26,10 +26,10 @@
                   Available
                 </div>
               </div>
-              <div class="mt-4 flex space-between">
+              <div class="mt-4 flex ">
                 <Modal :room="room" />
                 <NuxtLink :to="{ name: 'rooms-id', params: { id: room.room_id } }"
-                  class="inline-flex items-center justify-end pr-4 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 flex-1">
+                  class="inline-flex items-center mx-4 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-5 flex-1">
                   View Details
                 </NuxtLink>
               </div>
