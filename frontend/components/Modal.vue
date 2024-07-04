@@ -114,7 +114,6 @@ const props = defineProps<{
 
 const onError = (event: FormErrorEvent) => {
   console.log("error", event)
-
 }
 
 const selectedRoom = ref(props.room.room_name);
@@ -152,13 +151,6 @@ const meetingForm = z.object({
   )).min(1,'At least one participant is needed'),
   externalParticipants: z.array(z.string().min(1)).optional(),
 })
-
-
-interface Participants {
-  first_name: string;
-  last_name: string;
-  email: string;
-}
 
 const newExternalParticipant = ref('');
 const isOpen = ref(false);
@@ -205,7 +197,7 @@ const addParticipant = async (meeting_id: number | undefined, email: string) => 
   return result
 }
 const sendMeetingEmail = async (title: string, to: string, date: string, start_time: string, end_time: string) => {
-  const { mutate, loading, error } = useMutation(SendEmailDocument)
+  const { mutate } = useMutation(SendEmailDocument)
   const result = await mutate({
     input: {
       title,
@@ -218,7 +210,7 @@ const sendMeetingEmail = async (title: string, to: string, date: string, start_t
   return result
 }
 const mutateExternalParticipants = async (meeting_id: number | undefined) => {
-  const { mutate, loading, error } = useMutation(AddExternalParticipantDocument)
+  const { mutate } = useMutation(AddExternalParticipantDocument)
   const meetingObject = meeting.value.externalParticipants.map((meet) => {
     return {
       name: meet,
