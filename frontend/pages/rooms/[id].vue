@@ -45,12 +45,19 @@
           </div>
           <div v-else>
             <div v-for="meeting in meetings" :key="meeting.meeting_id"
-              class="bg-white dark:bg-gray-950 rounded-lg shadow-lg p-4 flex items-center justify-between">
+              class="bg-white dark:bg-gray-950 rounded-lg shadow-lg p-5 flex items-center justify-between">
               <div>
-                <h3 class="text-lg font-semibold">{{ meeting.title }}</h3>
-                <p class="text-gray-500 dark:text-gray-400">{{ meeting.start_time }}</p>
+                <div class="flex items-center space-x-2">
+                  <h3 class="text-lg font-semibold">{{ meeting.title }}</h3>
+                  <div
+                  class="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-200 dark:bg-green-700 text-green-500 dark:text-green-400"
+                  data-v0-t="badge">
+                  <p>{{ meeting.date }}</p>
+                </div>
+                </div>
+                <p class="text-gray-500 dark:text-gray-400"> {{  meeting.start_time }} - {{ meeting.end_time }}</p>
               </div>
-              <div v-if="getCurrentMilitaryTime() > meeting.start_time" class="flex items-center gap-2">
+              <div v-if="getCurrentMilitaryTime() > meeting.start_time && currentDate == meeting.date" class="flex items-center gap-2">
                 <div
                   class="inline-flex w-fit items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 bg-green-200 dark:bg-green-700 text-green-500 dark:text-green-400"
                   data-v0-t="badge">
@@ -88,6 +95,7 @@ interface roomProp {
 interface Meeting {
   title?: string | null,
   room_id: number,
+  date:string,
   meeting_id: number,
   creator: number,
   start_time: string,
