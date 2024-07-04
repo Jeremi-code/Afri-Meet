@@ -76,6 +76,7 @@
 <script lang="ts" setup>
 import { GetRoomByIdDocument, GetUpcomingMeetingsDocument } from '~/gqlGen/types';
 import { useAsyncQuery } from '#imports';
+import { formatDate } from 'date-fns';
 const route = useRoute()
 
 interface roomProp {
@@ -102,11 +103,16 @@ const { data: roomData, status, error, refresh } = useAsyncQuery(GetRoomByIdDocu
   id: route.params.id
 }
 )
-const { data: meetingsData, status: meetingsStatus, error: meetingsError, refresh: refreshMeetings } = useAsyncQuery(GetUpcomingMeetingsDocument, {
-  room_id: route.params.id,
-  current_time: getCurrentMilitaryTime()
-  ,
-});
+const currentDate = computed(() => formatDate(new Date(),'yyyy-MM-dd'))
+const { result: meetingsData, loading: meetingsStatus, error: meetingsError, refetch: refreshMeetings } = useQuery(GetUpcomingMeetingsDocument, {
+  room_id: parseInt(route.params.id as string),
+  current_time: getCurrentMilitaryTime(),
+  date:currentDate
+},
+{
+  fetchPolicy : 'no-cache'
+}
+);
 const meetings = ref<Meeting[]>([]);
 
 const roomDetail = ref<roomProp>({
@@ -129,6 +135,7 @@ watchEffect(() => {
       end_time: meeting.end_time
     }));
   }
+  console.log(meetingsData.value,'nullis')
 })
 
 </script>
