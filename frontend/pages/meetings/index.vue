@@ -127,7 +127,6 @@ interface Meeting {
   room: Room;
 }
 
-
 interface Room {
   room_name: string,
   room_id: number,
@@ -146,82 +145,80 @@ interface Users {
   first_name: string,
   last_name: string,
 }
-// const loading = ref(true)
 
 const authStore = useAuthStore()
 const { user_email, user_id } = storeToRefs(authStore)
+const currentDate = computed(() => formatDate(new Date(),'yyyy-MM-dd'))
 const user = ref<User>({ user_id: user_id.value!, email: user_email.value!, first_name: "", last_name: "" })
 
 const { data: roomData, status: roomStatus, error: roomError, refresh: refreshRoom , } = await useAsyncQuery(GetRoomsDocument)
 const roomsList = computed<Room[]>(() => {
   return roomData.value?.rooms ?? []
 })
-const refreshPage = async () => {
-  await refreshMeetings()
-}
-const currentDate = computed(() => formatDate(new Date(),'yyyy-MM-dd'))
 const { result: meetingData, loading, error: meetingError, refetch: refreshMeetings } = useQuery(GetMeetingsForUserDocument, {
-    user_id: user.value.user_id,
-    email: user.value.email,
-    date: currentDate.value
+  user_id: user.value.user_id,
+  email: user.value.email,
+  date: currentDate.value
   ,
   fetchPolicy: 'no-cache'
 });
+const { data: usersData, status: usersStatus, error: usersError, refresh: refreshUsers } =await useAsyncQuery(GetUsersDocument)
+
 const { mutate } = useMutation(DeleteMeetingDocument)
 const deleteMeeting = async (meeting_id:number) => {
   await mutate({
-   meeting_id
+    meeting_id
   })
   await refreshMeetings()
-  // meetingData.value!.createdMeetings = meetingData.value!.createdMeetings.filter((meeting) => meeting.meeting_id != meeting_id)
 }
-const { data: usersData, status: usersStatus, error: usersError, refresh: refreshUsers } =await useAsyncQuery(GetUsersDocument)
 
 const usersList = computed<Users[]>(() => {
   return usersData.value?.users ?? []
 })
 
 const createdMeetingsList = computed<Meeting[]>(() => {
-   return meetingData.value?.createdMeetings.map((meeting: any) => {
-      let room = roomsList.value.find((room) => room.room_id === meeting.room_id)
-      return ({
-        ...meeting,
-        room,
-        date: meeting.date as string,  // Cast date to string
-        participants: meeting.participants.map((participant: any) => {
-          let participantUser = usersList.value.find((user) => user.email === participant.email)
-          return {
-            email: participant.email,
-            name: participantUser ? participantUser.first_name + " " + participantUser.last_name : participant.email
-          }
-        })
+  return meetingData.value?.createdMeetings.map((meeting: any) => {
+    let room = roomsList.value.find((room) => room.room_id === meeting.room_id)
+    return ({
+      ...meeting,
+      room,
+      date: meeting.date as string,  // Cast date to string
+      participants: meeting.participants.map((participant: any) => {
+        let participantUser = usersList.value.find((user) => user.email === participant.email)
+        return {
+          email: participant.email,
+          name: participantUser ? participantUser.first_name + " " + participantUser.last_name : participant.email
+        }
       })
-    }) ?? []
+    })
+  }) ?? []
 })
-console.log(createdMeetingsList.value)
 const joinedMeetingsList = computed<Meeting[]>(() => {
   return meetingData.value?.joinedMeetings.map((meeting: any) => {
-      let room = roomsList.value.find((room) => room.room_id === meeting.room_id)
-      return ({
-        ...meeting,
-        room,
-        date: meeting.date as string,
-        participants: meeting.participants.map((participant: any) => {
-          let participantUser = usersList.value.find((user) => user.email === participant.email)
-          return {
-            email: participant.email,
-            name: participantUser ? participantUser.first_name + " " + participantUser.last_name : participant.email
-          }
-        })
+    let room = roomsList.value.find((room) => room.room_id === meeting.room_id)
+    return ({
+      ...meeting,
+      room,
+      date: meeting.date as string,
+      participants: meeting.participants.map((participant: any) => {
+        let participantUser = usersList.value.find((user) => user.email === participant.email)
+        return {
+          email: participant.email,
+          name: participantUser ? participantUser.first_name + " " + participantUser.last_name : participant.email
+        }
       })
-    }) ?? []
+    })
+  }) ?? []
 })
+const refreshPage = async () => {
+  await refreshMeetings()
+}
 async function refetchData() {
   loading.value = true
   await refreshMeetings()
   await refreshRoom()
   await refreshUsers()
-
+  
   loading.value = false
 }
 
