@@ -15,7 +15,7 @@
           </div>
         </template>
 
-        <UForm class="space-y-4" :schema="meetingForm" :state="meeting" @submit.prevent="onSubmit">
+        <UForm class="space-y-4" :schema="meetingForm" :state="meeting" @submit="onSubmit">
           <UFormGroup label="Meeting Title" name="title">
             <UInput v-model="meeting.title" id="title" />
           </UFormGroup>
@@ -36,7 +36,7 @@
             <UInput id="endTime" type="time" v-model="meeting.end_time" />
           </UFormGroup>
 
-          <UFormGroup label="Participants" name="participants">
+          <UFormGroup label="Participants" name="formattedParticipants">
             <USelectMenu v-if="participants !== null" v-model="meeting.formattedParticipants" multiple
               :options="formattedParticipants" id="participants">
               <template #leading>
@@ -45,6 +45,7 @@
               <template #empty>
                 None Selected
               </template>
+
             </USelectMenu>
           </UFormGroup>
 
@@ -142,7 +143,11 @@ const meetingForm = z.object({
     .pipe(z.date().min(startOfDayToday, 'Start Date cannot be in the past').max(startOfDayInAMonth, 'Cannot schedule meetings more than a month in advance')),
   start_time: z.string().refine(val => isValid(parse(val, 'HH:mm', new Date())), 'Start Time is Required'),
   end_time: z.string().refine(val => isValid(parse(val, 'HH:mm', new Date())), 'End Time is required'),
-  formattedParticipants: z.array(z.string().min(1)).optional(),
+  formattedParticipants: z.array(z.object({
+    value : z.string(),
+    label : z.string().optional()
+  }
+  )).min(1,'At least one participant is needed'),
   externalParticipants: z.array(z.string().min(1)).optional(),
 })
 
