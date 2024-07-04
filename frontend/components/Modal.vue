@@ -90,13 +90,12 @@
 </template>
 
 <script setup lang="ts">
-import type { FormSubmitEvent, FormErrorEvent} from '#ui/types'
+import type { FormErrorEvent} from '#ui/types'
 import type { ResultOf } from '@graphql-typed-document-node/core';
 import { GetUsersDocument, GetRoomByIdDocument, GetRoomsByNameDocument, AddExternalParticipantDocument, AddMeetingDocument, AddParticipantDocument, SendEmailDocument, GetMeetingIdDocument, GetBookedParticipantsDocument, GetRoomByMeetingIdDocument } from '~/gqlGen/types';
-import { ref, computed, watchEffect } from 'vue';
+import { ref, computed } from 'vue';
 import z from 'zod';
-import { isBefore, isValid, isAfter, addMonths, parse, startOfDay, addDays, addMinutes, formatDate } from 'date-fns';
-import type { RefSymbol } from '@vue/reactivity';
+import {  isValid, addMonths, parse, startOfDay,formatDate } from 'date-fns';
 
 interface ReservationForm {
   title: string;
@@ -109,9 +108,6 @@ interface ReservationForm {
 }
 
 type Room = ResultOf<typeof GetRoomByIdDocument>['room'][number];
-type RoomID = ResultOf<typeof GetRoomByMeetingIdDocument>['room'][number]
-type ReservedParticipants = ResultOf<typeof GetBookedParticipantsDocument>['participants']
-type ReservedMeetings = ResultOf<typeof GetMeetingIdDocument>['meeting']
 const props = defineProps<{
   room: Room;
 }>();
@@ -168,8 +164,6 @@ const newExternalParticipant = ref('');
 const isOpen = ref(false);
 const addExternalParticipants = ref(false);
 const loading = ref(false)
-const toast = useToast()
-const reservedMeetingID = ref(0)
 
 const { data: usersData } = useAsyncQuery(GetUsersDocument)
 const { data: meetingData } = useAsyncQuery(GetMeetingIdDocument, {
@@ -201,7 +195,7 @@ const addMeeting = async () => {
   return result
 }
 const addParticipant = async (meeting_id: number | undefined, email: string) => {
-  const { mutate, loading, error } = useMutation(AddParticipantDocument)
+  const { mutate } = useMutation(AddParticipantDocument)
   const result = await mutate({
     input: {
       meeting_id: meeting_id,
