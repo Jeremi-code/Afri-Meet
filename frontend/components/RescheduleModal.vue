@@ -120,6 +120,8 @@ const rescheduledMeeting = ref<RescheduleForm>({
   end_time: "",
 });
 
+const emit = defineEmits(['updateMeeting'])
+
 const parseDate = (dateStr: string) => {
   return startOfDay(parse(dateStr, "yyyy-MM-dd", new Date()));
 };
@@ -184,6 +186,15 @@ const sendMeetingEmail = async (
 };
 
 const onSubmit = async () => {
+  const validatedData = meetingForm.safeParse({
+      room: rescheduledMeeting.value.room,
+      date: rescheduledMeeting.value.date,
+      start_time: rescheduledMeeting.value.start_time,
+      end_time: rescheduledMeeting.value.end_time,
+    });
+  if (!validatedData.success) {
+    return
+  }
   const { data: meetingData } = useAsyncQuery(GetMeetingIdDocument, {
     date: rescheduledMeeting.value.date,
     startTime: rescheduledMeeting.value.start_time,
@@ -193,8 +204,8 @@ const onSubmit = async () => {
     name: rescheduledMeeting.value.room,
   });
 
-  const room_id = computed(() => roomData.value?.room[0].room_id);
-  const capacity = computed(() => roomData.value?.room[0].capacity);
+  const room_id = computed(() => roomData.value?.room[0].room_id || props.room.room_id);
+  const capacity = computed(() => roomData.value?.room[0].capacity || props.room.capacity);
   const reservedMeetings = computed(() => meetingData.value?.meeting);
   const currentTime = getCurrentMilitaryTime().split(":");
   const currentDate = formatDate(new Date(), "yyyy-MM-dd");
@@ -227,8 +238,6 @@ const onSubmit = async () => {
     capacity.value! <
     toRaw(props.participants.length) + toRaw(props.external_participants.length)
   ) {
-    console.log(props.participants.length + props.external_participants.length);
-    console.log(props.participants);
     useCustomToast("Room does not have the capacity for this meeting", "error");
     return;
   }
@@ -261,6 +270,7 @@ const onSubmit = async () => {
       }
     }
   }
+  console.log(room_id.value)
   try {
     await mutate({
       meeting_id : props.meeting_id,
@@ -272,6 +282,7 @@ const onSubmit = async () => {
     for (const participant of props.participants) {
       await sendMeetingEmail(props.title!,participant.email,rescheduledMeeting.value.date,rescheduledMeeting.value.start_time,rescheduledMeeting.value.end_time)
     }
+    emit('updateMeeting')
   } catch (error) {
     console.log(error)
     useCustomToast('Error updating a meeting','error')
