@@ -12,6 +12,7 @@ export default defineNuxtConfig({
     clients: {
       default: {
         httpEndpoint: "http://localhost:8080/v1/graphql",
+        wsEndpoint: 'ws://localhost:8080/v1/graphql',
       },
     },
   },
