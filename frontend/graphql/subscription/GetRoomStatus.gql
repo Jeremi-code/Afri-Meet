@@ -1,14 +1,11 @@
-subscription GetRoomStatus($room_id: Int!, $current_time: String!) {
+subscription GetRoomStatus($room_ids: [Int!], $date: date!) {
   rooms: afrimeet_meetings(
     where: {
-      date: { _eq: "today()" }
-      room_id: { _eq: $room_id }
-      _and: [
-        { start_time: { _lte: $current_time } }
-        { end_time: { _gte: $current_time } }
-      ]
+      date: {_eq: $date}
+      room_id: { _in: $room_ids }
     }
   ) {
+    room_id
     start_time
     end_time
   }
