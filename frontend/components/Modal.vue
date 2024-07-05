@@ -158,15 +158,11 @@ const addExternalParticipants = ref(false);
 const loading = ref(false)
 
 const { data: usersData } = useAsyncQuery(GetUsersDocument)
-const { data: meetingData } = useAsyncQuery(GetMeetingIdDocument, {
-  date: meeting.value.date,
-  startTime: meeting.value.start_time,
-  endTime: meeting.value.end_time
-})
+
 const { data: roomData } = useAsyncQuery(GetRoomsByNameDocument, {
   name: meeting.value.room
 })
-const reservedMeetings = computed(() => meetingData.value?.meeting)
+
 const participants = computed(() => usersData.value?.users)
 const room_id = computed(() => roomData.value?.room[0].room_id)
 const capacity = computed(() => roomData.value?.room[0].capacity)
@@ -232,24 +228,30 @@ const clearForm = () => {
   meeting.value.externalParticipants = []
   meeting.value.formattedParticipants = []
 }
+const customToaster = useCustomToast()
 
 const onSubmit = async () => {
-
+  const { data: meetingData,refresh:refetchReservedMeetings } = useAsyncQuery(GetMeetingIdDocument, {
+  date: meeting.value.date,
+  startTime: meeting.value.start_time,
+  endTime: meeting.value.end_time
+})
+  const reservedMeetings = computed(() => meetingData.value?.meeting ?? [])
   const currentTime = getCurrentMilitaryTime().split(':')
   const currentDate = formatDate(new Date(),'yyyy-MM-dd')
   const normalizedStartedTime = meeting.value.start_time.split(':')
   const normalizedEndTime = meeting.value.end_time.split(':')
   if (normalizedEndTime[0] <= normalizedStartedTime[0]) {
     if ((parseInt(normalizedEndTime[1]) - parseInt(normalizedStartedTime[1]) < 10) || (parseInt(normalizedEndTime[0]) < parseInt(normalizedStartedTime[0]))) {
-      useCustomToast('end time and start time must have at least a 10 min difference',"error")
+      customToaster.add('end time and start time must have at least a 10 min difference',"error")
       return
     }
-  } if (meeting.value.date == currentDate && (currentTime[0] > normalizedStartedTime[0] || (currentTime[0] == normalizedStartedTime[0] && currentTime[1] < normalizedStartedTime[1]))) {
-    useCustomToast('Time has already passed','error')
+  } if (meeting.value.date == currentDate && (currentTime[0] > normalizedStartedTime[0] || (currentTime[0] == normalizedStartedTime[0] && currentTime[1] > normalizedStartedTime[1]))) {
+    customToaster.add('Time has already passed','error')
     return
   }
   if (capacity.value! < toRaw(meeting.value.formattedParticipants.length) + toRaw(meeting.value.externalParticipants.length)) {
-    useCustomToast('Room does not have the capacity for this meeting','error')
+    customToaster.add('Room does not have the capacity for this meeting','error')
     return
   }
   if (reservedMeetings.value) {
@@ -262,19 +264,20 @@ const onSubmit = async () => {
       })
     })
     if (toRaw(reservedRoomList.includes(room_id.value!))) {
-      useCustomToast('The Room is reserved at this time','error')
+      customToaster.add('The Room is reserved at this time','error')
       return;
     }
     if (reservedParticipantsList) {
       const meetings = meeting.value.formattedParticipants;
       for (const meet of meetings) {
         if (reservedParticipantsList.includes(meet.value)) {
-          useCustomToast('Person who is invivted to a meeting at the time is included','error')
+          customToaster.add('Person who is invivted to a meeting at the time is included','error')
           return;
         }
       }
     }
   }
+  return
   try {
     loading.value = true
     const meetingResult = await addMeeting()
@@ -286,10 +289,10 @@ const onSubmit = async () => {
     })
     await mutateExternalParticipants(meetingID)
     clearForm()
-    useCustomToast('meeting added successfully','ok')
+    customToaster.add('meeting added successfully','ok')
   } catch (error: any) {
     console.log(error.toString())
-    useCustomToast('error on adding a meeting','error')
+    customToaster.add('error on adding a meeting','error')
   } finally {
     loading.value = false
     isOpen.value = false
