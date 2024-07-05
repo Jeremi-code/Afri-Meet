@@ -184,6 +184,7 @@ const sendMeetingEmail = async (
   });
   return result;
 };
+const customToaster = useCustomToast()
 
 const clearForm = () => {
   rescheduledMeeting.value.date = ''
@@ -220,7 +221,7 @@ const onSubmit = async () => {
         10 ||
       parseInt(normalizedEndTime[0]) < parseInt(normalizedStartedTime[0])
     ) {
-      useCustomToast(
+      customToaster.add(
         "end time and start time must have at least a 10 min difference",
         "error"
       );
@@ -233,14 +234,14 @@ const onSubmit = async () => {
       (currentTime[0] == normalizedStartedTime[0] &&
         currentTime[1] < normalizedStartedTime[1]))
   ) {
-    useCustomToast("Time has already passed", "error");
+    customToaster.add("Time has already passed", "error");
     return;
   }
   if (
     capacity.value! <
     toRaw(props.participants.length) + toRaw(props.external_participants.length)
   ) {
-    useCustomToast("Room does not have the capacity for this meeting", "error");
+    customToaster.add("Room does not have the capacity for this meeting", "error");
     return;
   }
   if (reservedMeetings.value) {
@@ -256,14 +257,14 @@ const onSubmit = async () => {
       });
     });
     if (toRaw(reservedRoomList.includes(room_id.value!))) {
-      useCustomToast("The Room is reserved at this time", "error");
+      customToaster.add("The Room is reserved at this time", "error");
       return;
     }
     if (reservedParticipantsList) {
       const participants = props.participants;
       for (const participant of participants) {
         if (reservedParticipantsList.includes(participant.email)) {
-          useCustomToast(
+          customToaster.add(
             "Person who is invivted to a meeting at the time is included",
             "error"
           );
@@ -289,13 +290,13 @@ const onSubmit = async () => {
         rescheduledMeeting.value.end_time
       );
     }
-    useCustomToast('Meeting has been rescheduled successfully','ok')
+    customToaster.add('Meeting has been rescheduled successfully','ok')
     clearForm()
     isOpen.value = false
     emit("updateMeeting");
   } catch (error) {
     console.log(error);
-    useCustomToast("Error updating a meeting", "error");
+    customToaster.add("Error updating a meeting", "error");
   }
 };
 </script>
