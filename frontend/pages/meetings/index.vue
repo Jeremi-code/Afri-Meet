@@ -23,7 +23,9 @@
         <div class="flex items-center justify-between">
           <h2 class="text-xl font-semibold">{{ createdMeeting.title }}</h2>
           <div class="flex items-center gap-2">
-            <RescheduleModal :room="createdMeeting.room" :participants="createdMeeting.participants" :external_participants="createdMeeting.external_participants" :meeting_id="createdMeeting.meeting_id" :title="createdMeeting.title" @update-meeting="refreshPage"/>
+            <RescheduleModal :room="createdMeeting.room" :participants="createdMeeting.participants"
+              :external_participants="createdMeeting.external_participants" :meeting_id="createdMeeting.meeting_id"
+              :title="createdMeeting.title" @update-meeting="refreshPage" />
             <button @click="deleteMeeting(createdMeeting.meeting_id)"
               class="bg-red-500 text-white hover:bg-red-600 inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-9 rounded-md px-3">
               Cancel
@@ -148,10 +150,10 @@ interface Users {
 
 const authStore = useAuthStore()
 const { user_email, user_id } = storeToRefs(authStore)
-const currentDate = computed(() => formatDate(new Date(),'yyyy-MM-dd'))
+const currentDate = computed(() => formatDate(new Date(), 'yyyy-MM-dd'))
 const user = ref<User>({ user_id: user_id.value!, email: user_email.value!, first_name: "", last_name: "" })
 
-const { data: roomData, status: roomStatus, error: roomError, refresh: refreshRoom , } = await useAsyncQuery(GetRoomsDocument)
+const { data: roomData, status: roomStatus, error: roomError, refresh: refreshRoom, } = await useAsyncQuery(GetRoomsDocument)
 const roomsList = computed<Room[]>(() => {
   return roomData.value?.rooms ?? []
 })
@@ -159,13 +161,15 @@ const { result: meetingData, loading, error: meetingError, refetch: refreshMeeti
   user_id: user.value.user_id,
   email: user.value.email,
   date: currentDate.value
-  ,
-  fetchPolicy: 'no-cache'
-});
-const { data: usersData, status: usersStatus, error: usersError, refresh: refreshUsers } =await useAsyncQuery(GetUsersDocument)
+},
+  {
+    fetchPolicy: 'no-cache'
+  }
+);
+const { data: usersData, status: usersStatus, error: usersError, refresh: refreshUsers } = await useAsyncQuery(GetUsersDocument)
 
 const { mutate } = useMutation(DeleteMeetingDocument)
-const deleteMeeting = async (meeting_id:number) => {
+const deleteMeeting = async (meeting_id: number) => {
   await mutate({
     meeting_id
   })
@@ -182,7 +186,7 @@ const createdMeetingsList = computed<Meeting[]>(() => {
     return ({
       ...meeting,
       room,
-      date: meeting.date as string,  // Cast date to string
+      date: meeting.date as string,  
       participants: meeting.participants.map((participant: any) => {
         let participantUser = usersList.value.find((user) => user.email === participant.email)
         return {
@@ -193,8 +197,13 @@ const createdMeetingsList = computed<Meeting[]>(() => {
     })
   }) ?? []
 })
+
+const createdMeetingIds = computed(() => createdMeetingsList.value.map(meeting => meeting.meeting_id))
+
 const joinedMeetingsList = computed<Meeting[]>(() => {
-  return meetingData.value?.joinedMeetings.map((meeting: any) => {
+  return meetingData.value?.joinedMeetings.filter((meeting: any) => {
+    return !createdMeetingIds.value.includes(meeting.meeting_id)
+  }).map((meeting: any) => {
     let room = roomsList.value.find((room) => room.room_id === meeting.room_id)
     return ({
       ...meeting,
@@ -218,7 +227,7 @@ async function refetchData() {
   await refreshMeetings()
   await refreshRoom()
   await refreshUsers()
-  
+
   loading.value = false
 }
 
