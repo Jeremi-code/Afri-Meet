@@ -15,4 +15,4 @@ This Meeting Scheduler System is designed to simplify the process of scheduling 
 - **Frontend**: Vue.js/Nuxt.js with Tailwind CSS for a responsive and interactive user interface.
 - **Backend**: Node.js/Express with Hasura for efficient data management and GraphQL API.
 - **Database**: PostgreSQL for reliable data storage.
-- **Email Service**: Integrated email service for sending notifications.
+- **Email Service**: nodemailer email service for sending notifications.
