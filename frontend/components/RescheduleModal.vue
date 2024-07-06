@@ -2,46 +2,25 @@
   <div>
     <UButton
       class="inline-flex text-black items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3"
-      label="Reschedule"
-      @click="isOpen = true"
-    />
+      label="Reschedule" @click="isOpen = true" />
     <UModal v-model="isOpen">
-      <UCard
-        :ui="{
-          ring: '',
-          divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-        }"
-      >
+      <UCard :ui="{
+        ring: '',
+        divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+      }">
         <template #header>
           <div class="flex items-center justify-between">
-            <h3
-              class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
-            >
+            <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
               Reserve {{}}
             </h3>
-            <UButton
-              color="gray"
-              variant="ghost"
-              icon="i-heroicons-x-mark-20-solid"
-              class="-my-1"
-              @click="isOpen = false"
-            />
+            <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+              @click="isOpen = false" />
           </div>
         </template>
 
-        <UForm
-          class="space-y-4"
-          :schema="meetingForm"
-          :state="rescheduledMeeting"
-          @submit="onSubmit"
-        >
+        <UForm class="space-y-4" :schema="meetingForm" :state="rescheduledMeeting" @submit="onSubmit">
           <UFormGroup label="Room" name="room">
-            <UInputMenu
-              v-model="rescheduledMeeting.room"
-              :options="rooms"
-              placeholder="Select a room"
-              id="room"
-            />
+            <UInputMenu v-model="rescheduledMeeting.room" :options="rooms" placeholder="Select a room" id="room" />
           </UFormGroup>
 
           <UFormGroup label="Date" name="date">
@@ -49,19 +28,11 @@
           </UFormGroup>
 
           <UFormGroup label="Start Time" name="start_time">
-            <UInput
-              id="startTime"
-              type="time"
-              v-model="rescheduledMeeting.start_time"
-            />
+            <UInput id="startTime" type="time" v-model="rescheduledMeeting.start_time" />
           </UFormGroup>
 
           <UFormGroup label="End Time" name="end_time">
-            <UInput
-              id="endTime"
-              type="time"
-              v-model="rescheduledMeeting.end_time"
-            />
+            <UInput id="endTime" type="time" v-model="rescheduledMeeting.end_time" />
           </UFormGroup>
           <div class="flex justify-end mt-4">
             <UButton label="Save" type="submit" />
@@ -104,6 +75,9 @@ const props = defineProps<{
   participants: Participant[];
   external_participants: ExternalParticipant[];
   meeting_id: number;
+  end_time: string;
+  start_time: string;
+  date: string;
   title: string | null | undefined;
 }>();
 const selectedRoom = ref(props.room.room_name);
@@ -115,9 +89,9 @@ interface RescheduleForm {
 }
 const rescheduledMeeting = ref<RescheduleForm>({
   room: selectedRoom.value,
-  date: "",
-  start_time: "",
-  end_time: "",
+  date: props.date,
+  start_time: props.start_time,
+  end_time: props.end_time,
 });
 
 const emit = defineEmits(["updateMeeting"]);
@@ -162,8 +136,6 @@ const rooms = [
   "Huddle Room",
 ];
 const { mutate, loading, error } = useMutation(RescheduleMeetingDocument);
-console.log(rescheduledMeeting.value.date);
-console.log(rescheduledMeeting.value.start_time);
 
 const sendMeetingEmail = async (
   title: string,
@@ -194,31 +166,32 @@ const clearForm = () => {
 }
 
 const onSubmit = async () => {
-  const { data: meetingData } = useAsyncQuery(GetMeetingIdDocument, {
+  
+  const { result: meetingData, refetch: refreshMeetings } = await useQuery(GetMeetingIdDocument, {
     date: rescheduledMeeting.value.date,
     startTime: rescheduledMeeting.value.start_time,
     endTime: rescheduledMeeting.value.end_time,
   });
-  const { data: roomData } = useAsyncQuery(GetRoomsByNameDocument, {
+  const { result: roomData,refetch } = useQuery(GetRoomsByNameDocument, {
     name: rescheduledMeeting.value.room,
   });
-
   const room_id = computed(
     () => roomData.value?.room[0].room_id || props.room.room_id
   );
   const capacity = computed(
     () => roomData.value?.room[0].capacity || props.room.capacity
   );
+  await refreshMeetings()
+  await refetch()
   const reservedMeetings = computed(() => meetingData.value?.meeting);
   const currentTime = getCurrentMilitaryTime().split(":");
   const currentDate = formatDate(new Date(), "yyyy-MM-dd");
   const normalizedStartedTime = rescheduledMeeting.value.start_time.split(":");
   const normalizedEndTime = rescheduledMeeting.value.end_time.split(":");
-  console.log(reservedMeetings.value);
   if (normalizedEndTime[0] <= normalizedStartedTime[0]) {
     if (
       parseInt(normalizedEndTime[1]) - parseInt(normalizedStartedTime[1]) <
-        10 ||
+      10 ||
       parseInt(normalizedEndTime[0]) < parseInt(normalizedStartedTime[0])
     ) {
       customToaster.add(
@@ -231,8 +204,8 @@ const onSubmit = async () => {
   if (
     rescheduledMeeting.value.date == currentDate &&
     (currentTime[0] > normalizedStartedTime[0] ||
-      (currentTime[0] == normalizedStartedTime[0] &&
-        currentTime[1] < normalizedStartedTime[1]))
+    (currentTime[0] == normalizedStartedTime[0] &&
+    currentTime[1] > normalizedStartedTime[1]))
   ) {
     customToaster.add("Time has already passed", "error");
     return;
@@ -290,12 +263,11 @@ const onSubmit = async () => {
         rescheduledMeeting.value.end_time
       );
     }
-    customToaster.add('Meeting has been rescheduled successfully','ok')
+    customToaster.add('Meeting has been rescheduled successfully', 'ok')
     clearForm()
     isOpen.value = false
     emit("updateMeeting");
   } catch (error) {
-    console.log(error);
     customToaster.add("Error updating a meeting", "error");
   }
 };
