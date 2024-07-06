@@ -76,7 +76,7 @@
             </div>
           </UFormGroup>
           <div class="flex justify-end mt-4">
-            <UButton label="Save" type="submit"  />
+            <UButton label="Save" type="submit" />
           </div>
         </UForm>
       </UCard>
@@ -90,12 +90,12 @@
 </template>
 
 <script setup lang="ts">
-import type { FormErrorEvent} from '#ui/types'
+import type { FormErrorEvent } from '#ui/types'
 import type { ResultOf } from '@graphql-typed-document-node/core';
 import { GetUsersDocument, GetRoomByIdDocument, GetRoomsByNameDocument, AddExternalParticipantDocument, AddMeetingDocument, AddParticipantDocument, SendEmailDocument, GetMeetingIdDocument, GetBookedParticipantsDocument, GetRoomByMeetingIdDocument } from '~/gqlGen/types';
 import { ref, computed } from 'vue';
 import z from 'zod';
-import {  isValid, addMonths, parse, startOfDay,formatDate } from 'date-fns';
+import { isValid, addMonths, parse, startOfDay, formatDate } from 'date-fns';
 
 interface ReservationForm {
   title: string;
@@ -145,10 +145,10 @@ const meetingForm = z.object({
   start_time: z.string().refine(val => isValid(parse(val, 'HH:mm', new Date())), 'Start Time is Required'),
   end_time: z.string().refine(val => isValid(parse(val, 'HH:mm', new Date())), 'End Time is required'),
   formattedParticipants: z.array(z.object({
-    value : z.string(),
-    label : z.string().optional()
+    value: z.string(),
+    label: z.string().optional()
   }
-  )).min(1,'At least one participant is needed'),
+  )).min(1, 'At least one participant is needed'),
   externalParticipants: z.array(z.string().min(1)).optional(),
 })
 
@@ -229,29 +229,29 @@ const clearForm = () => {
   meeting.value.formattedParticipants = []
 }
 const customToaster = useCustomToast()
-
 const onSubmit = async () => {
-  const { data: meetingData,refresh:refetchReservedMeetings } = useAsyncQuery(GetMeetingIdDocument, {
-  date: meeting.value.date,
-  startTime: meeting.value.start_time,
-  endTime: meeting.value.end_time
-})
+  const { result: meetingData, error: newerror, refetch: refetchReservedMeetings } = await useQuery(GetMeetingIdDocument, {
+    date: meeting.value.date,
+    startTime: meeting.value.start_time,
+    endTime: meeting.value.end_time
+  })
   const reservedMeetings = computed(() => meetingData.value?.meeting ?? [])
+  await refetchReservedMeetings()
   const currentTime = getCurrentMilitaryTime().split(':')
-  const currentDate = formatDate(new Date(),'yyyy-MM-dd')
+  const currentDate = formatDate(new Date(), 'yyyy-MM-dd')
   const normalizedStartedTime = meeting.value.start_time.split(':')
   const normalizedEndTime = meeting.value.end_time.split(':')
   if (normalizedEndTime[0] <= normalizedStartedTime[0]) {
     if ((parseInt(normalizedEndTime[1]) - parseInt(normalizedStartedTime[1]) < 10) || (parseInt(normalizedEndTime[0]) < parseInt(normalizedStartedTime[0]))) {
-      customToaster.add('end time and start time must have at least a 10 min difference',"error")
+      customToaster.add('end time and start time must have at least a 10 min difference', "error")
       return
     }
   } if (meeting.value.date == currentDate && (currentTime[0] > normalizedStartedTime[0] || (currentTime[0] == normalizedStartedTime[0] && currentTime[1] > normalizedStartedTime[1]))) {
-    customToaster.add('Time has already passed','error')
+    customToaster.add('Time has already passed', 'error')
     return
   }
   if (capacity.value! < toRaw(meeting.value.formattedParticipants.length) + toRaw(meeting.value.externalParticipants.length)) {
-    customToaster.add('Room does not have the capacity for this meeting','error')
+    customToaster.add('Room does not have the capacity for this meeting', 'error')
     return
   }
   if (reservedMeetings.value) {
@@ -264,20 +264,19 @@ const onSubmit = async () => {
       })
     })
     if (toRaw(reservedRoomList.includes(room_id.value!))) {
-      customToaster.add('The Room is reserved at this time','error')
+      customToaster.add('The Room is reserved at this time', 'error')
       return;
     }
     if (reservedParticipantsList) {
       const meetings = meeting.value.formattedParticipants;
       for (const meet of meetings) {
         if (reservedParticipantsList.includes(meet.value)) {
-          customToaster.add('Person who is invivted to a meeting at the time is included','error')
+          customToaster.add('Person who is invivted to a meeting at the time is included', 'error')
           return;
         }
       }
     }
   }
-  return
   try {
     loading.value = true
     const meetingResult = await addMeeting()
@@ -289,10 +288,10 @@ const onSubmit = async () => {
     })
     await mutateExternalParticipants(meetingID)
     clearForm()
-    customToaster.add('meeting added successfully','ok')
+    customToaster.add('meeting added successfully', 'ok')
   } catch (error: any) {
     console.log(error.toString())
-    customToaster.add('error on adding a meeting','error')
+    customToaster.add('error on adding a meeting', 'error')
   } finally {
     loading.value = false
     isOpen.value = false
