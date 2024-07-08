@@ -1,6 +1,6 @@
 <template>
-    <nav class="sticky top-0 w-screen  bg-white h-16 z-50 border border-">
-        <UContainer class="container mx-auto px-4 py-2 flex justify-between items-center h-full">
+    <nav class="sticky top-0 w-screen px-10 bg-white h-16 z-50 border border-">
+        <div class="px-6 py-2 flex justify-between items-center h-full">
             <ULink class="text-lg font-bold text-gray-600 hover:text-gray transition-colors duration-300" to="/">
                 Afrimeet
             </ULink>
@@ -29,7 +29,6 @@
                             Login
                         </UButton>
                     </li>
-
                 </div>
                 <div  v-else class="flex flex-row px-2">
                     <li>
@@ -37,11 +36,10 @@
                             to="/login" variant="link" @click="handleLogout">
                             Logout
                         </UButton>
-
                     </li>
                 </div>
             </ul>
-        </UContainer>
+        </div>
     </nav>
 </template>
 
