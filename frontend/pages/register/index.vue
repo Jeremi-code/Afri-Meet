@@ -33,7 +33,6 @@
               </div>
             </div>
             <div v-if="formShowError && errors.password" class="text-red-500 text-sm mt-1">{{ errors.password }}</div>
-
           </div>
           <div class="mb-5">
             <label for="confirmPassword" class="block text-gray-700 font-bold text-sm">Confirm Password:</label>
@@ -71,7 +70,7 @@
 
 <script setup lang="ts">
 import z from "zod";
-import { useMutation} from '@vue/apollo-composable';
+import { useMutation } from '@vue/apollo-composable';
 import { SignupDocument } from "~/gqlGen/types";
 
 interface Form {
@@ -105,7 +104,7 @@ const confirmPasswordVisible = ref(false)
 const storeAuth = useAuthStore()
 const customToaster = useCustomToast()
 
-const { mutate, loading} = useMutation(SignupDocument);
+const { mutate, loading } = useMutation(SignupDocument);
 
 const closeError = () => {
   formShowError.value = false
@@ -160,7 +159,7 @@ const submitForm = async () => {
       }
       clearForm()
       navigateTo('/meetings')
-      customToaster.add('Account created successfully','ok')
+      customToaster.add('Account created successfully', 'ok')
     }
 
   } catch (error: any) {
