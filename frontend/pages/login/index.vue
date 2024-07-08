@@ -71,7 +71,6 @@ const globalError = ref(false)
 const jwtParser = useJwtParser()
 const { onLogin } = useApollo()
 const authStore = useAuthStore()
-const toast = useToast()
 const customToaster = useCustomToast()
 
 const closeError = () => {
