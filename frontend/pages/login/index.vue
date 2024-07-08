@@ -28,7 +28,7 @@
                             errors.password }}</div>
                     </div>
                     <button type="submit" :disabled="loading"
-                        class="w-full bg-[#84CC16] text-white py-[5px] px-4 rounded-md transition-colors hover:opacity-75 mb-5">
+                        class="w-full bg-[#84CC16] text-white py-[5px] px-4 rounded-md transition-colors hover:opacity-75 mb-5 flex justify-center items-center">
                         <template v-if="loading">
                             <div class="spinner mr-2"></div> Loading...
                         </template>
@@ -36,7 +36,7 @@
                             Sign In
                         </template>
                     </button>
-                    <ULink to="/register" class="mb-5 text-blue-500 underline flex items-center justify-center">
+                    <ULink to="/register" class="mb-4 text-blue-500 underline flex items-center justify-center">
                         Create new account
                     </ULink>
                 </form>
@@ -78,8 +78,7 @@ const globalError = ref(false)
 const togglePasswordVisibility = () => {
     passwordVisible.value = !passwordVisible.value;
 };
-const { loading, error, mutate } = useMutation(LoginDocument)
-const router = useRouter()
+const { loading,mutate } = useMutation(LoginDocument)
 const authStore = useAuthStore()
 const validateForm = () => {
     const result = signinForm.safeParse(form.value)
