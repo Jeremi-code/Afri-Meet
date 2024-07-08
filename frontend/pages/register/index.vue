@@ -71,7 +71,7 @@
 
 <script setup lang="ts">
 import z from "zod";
-import { useMutation, useQuery } from '@vue/apollo-composable';
+import { useMutation} from '@vue/apollo-composable';
 import { SignupDocument } from "~/gqlGen/types";
 
 interface Form {
@@ -102,12 +102,10 @@ const errors = ref<{ [key: string]: string }>({})
 const passwordVisible = ref(false);
 const confirmPasswordVisible = ref(false)
 
-const router = useRouter()
 const storeAuth = useAuthStore()
-const toast = useToast()
 const customToaster = useCustomToast()
 
-const { mutate, loading, error } = useMutation(SignupDocument);
+const { mutate, loading} = useMutation(SignupDocument);
 
 const closeError = () => {
   formShowError.value = false
@@ -161,7 +159,7 @@ const submitForm = async () => {
         throw new Error(emailErr)
       }
       clearForm()
-      router.push('/meetings')
+      navigateTo('/meetings')
       customToaster.add('Account created successfully','ok')
     }
 
