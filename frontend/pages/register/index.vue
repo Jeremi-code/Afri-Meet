@@ -6,17 +6,17 @@
         <form @submit.prevent="submitForm">
           <div class="mb-1">
             <label for="firstName" class="block text-gray-700 font-bold text-sm">First Name:</label>
-            <input type="text" id="firstName" @input="closeError" v-model="form.firstName" required
+            <input type="text" id="firstName" @input="closeError" v-model="RegisterationForm.firstName" required
               class="bg-white mt-[2px] block w-full rounded-md border border-gray-300 py-[5px] px-2 shadow-sm text-sm" />
           </div>
           <div class="mb-1">
             <label for="lastName" class="block text-gray-700 font-bold text-sm">Last Name:</label>
-            <input type="text" id="lastName" @input="closeError" v-model="form.lastName" required
+            <input type="text" id="lastName" @input="closeError" v-model="RegisterationForm.lastName" required
               class="bg-white mt-[2px] block w-full rounded-md border border-gray-300 py-[5px] px-2 shadow-sm text-sm" />
           </div>
           <div class="mb-1">
             <label for="email" class="block text-gray-700 font-bold text-sm">Email:</label>
-            <input type="text" id="email" @input="closeError" v-model="form.email" required
+            <input type="text" id="email" @input="closeError" v-model="RegisterationForm.email" required
               class="bg-white mt-[2px] block w-full rounded-md border border-gray-300 py-[5px] px-2 shadow-sm text-sm" />
             <div v-if="formShowError && errors.email" class="text-red-500 text-sm mt-1">{{ errors.email }}</div>
           </div>
@@ -24,7 +24,7 @@
             <label for="password" class="block text-gray-700 font-bold text-sm">Password:</label>
             <div class="relative">
               <input :type="passwordVisible ? 'text' : 'password'" id="password" @input="closeError"
-                v-model="form.password" required
+                v-model="RegisterationForm.password" required
                 class="bg-white mt-[2px] block w-full rounded-md border border-gray-300 py-[5px] px-2 shadow-sm text-sm" />
               <div @click="togglePasswordVisibility"
                 class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-700">
@@ -39,7 +39,7 @@
             <label for="confirmPassword" class="block text-gray-700 font-bold text-sm">Confirm Password:</label>
             <div class="relative">
               <input :type="confirmPasswordVisible ? 'text' : 'password'" id="confirmPassword" @input="closeError"
-                v-model="form.confirmPassword" required
+                v-model="RegisterationForm.confirmPassword" required
                 class="bg-white mt-[2px] block w-full rounded-md border border-gray-300 py-[5px] px-2 shadow-sm text-sm" />
               <div @click="toggleConfirmPasswordVisibility"
                 class="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-700">
@@ -90,39 +90,45 @@ const signupForm = z.object({
   lastName: z.string(),
 });
 
-const form: Ref<Form> = ref({
+const RegisterationForm: Ref<Form> = ref({
   email: "",
   password: "",
   confirmPassword: "",
   firstName: "",
   lastName: "",
 });
+const formShowError = ref<boolean>(false)
+const errors = ref<{ [key: string]: string }>({})
+const passwordVisible = ref(false);
+const confirmPasswordVisible = ref(false)
 
 const router = useRouter()
-const authToken = useCookie('auth-token')
 const storeAuth = useAuthStore()
 const toast = useToast()
+const customToaster = useCustomToast()
 
 const { mutate, loading, error } = useMutation(SignupDocument);
 
-const formShowError = ref<boolean>(false)
-const errors = ref<{ [key: string]: string }>({})
 const closeError = () => {
   formShowError.value = false
 }
-const passwordVisible = ref(false);
-const confirmPasswordVisible = ref(false)
 const togglePasswordVisibility = () => {
   passwordVisible.value = !passwordVisible.value;
 };
-
 const toggleConfirmPasswordVisibility = () => {
   confirmPasswordVisible.value = !confirmPasswordVisible.value
+}
+const clearForm = () => {
+  RegisterationForm.value.email = ''
+  RegisterationForm.value.password = ''
+  RegisterationForm.value.firstName = ''
+  RegisterationForm.value.lastName = ''
+  RegisterationForm.value.confirmPassword = ''
 }
 
 const submitForm = async () => {
   try {
-    const result = signupForm.safeParse(form.value);
+    const result = signupForm.safeParse(RegisterationForm.value);
     if (!result.success) {
       formShowError.value = true
       errors.value = {}
@@ -130,7 +136,7 @@ const submitForm = async () => {
         errors.value[err.path[0]] = err.message
       })
     }
-    if (form.value.password !== form.value.confirmPassword) {
+    if (RegisterationForm.value.password !== RegisterationForm.value.confirmPassword) {
       errors.value.confirmPassword = 'Password does not match'
       formShowError.value = true
       return
@@ -138,39 +144,25 @@ const submitForm = async () => {
     if (result.success) {
       const response = await mutate({
         input: {
-          first_name: form.value.firstName,
-          last_name: form.value.lastName,
-          email: form.value.email,
-          password: form.value.password,
+          first_name: RegisterationForm.value.firstName,
+          last_name: RegisterationForm.value.lastName,
+          email: RegisterationForm.value.email,
+          password: RegisterationForm.value.password,
         }
       })
       if (response?.data?.signup?.token) {
-        // authToken.value = response?.data?.signup?.token
         const newToken = response?.data?.signup?.token
         const user_id = response?.data?.signup?.user_id
-        const user_email = form.value.email
-        storeAuth.login(newToken,user_id as number,user_email)
-        
+        const user_email = RegisterationForm.value.email
+        storeAuth.login(newToken, user_id as number, user_email)
       }
       else if (response?.errors && response.errors.length > 0) {
         const emailErr = response.errors[0]?.message
         throw new Error(emailErr)
       }
-      form.value.email = ''
-      form.value.password = ''
-      form.value.firstName = ''
-      form.value.lastName = ''
-      form.value.confirmPassword = ''
+      clearForm()
       router.push('/meetings')
-      toast.add({
-        title: "account created successfully",
-        color: 'green',
-        icon: 'i-heroicons-check-circle',
-        ui: {
-          backgroundColor: 'green'
-        }
-
-      })
+      customToaster.add('Account created successfully','ok')
     }
 
   } catch (error: any) {
