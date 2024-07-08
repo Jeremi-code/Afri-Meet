@@ -48,7 +48,6 @@
 <script setup lang="ts">
 import z from 'zod';
 import { LoginDocument } from '~/gqlGen/types';
-import { _backgroundColor } from '#tailwind-config/theme';
 
 interface Form {
     email: string;
@@ -73,6 +72,7 @@ const jwtParser = useJwtParser()
 const { onLogin } = useApollo()
 const authStore = useAuthStore()
 const toast = useToast()
+const customToaster = useCustomToast()
 
 const closeError = () => {
     formErrorVisible.value = false
@@ -109,16 +109,7 @@ const submitForm = async () => {
             const user_email = form.value.email
             const parseResult = await jwtParser.parse(newToken)
             if (parseResult) {
-                const { payload } = parseResult
-                console.log(payload)
-                toast.add({
-                    title: 'login successful',
-                    color: 'green',
-                    icon: 'i-heroicons-check-circle',
-                    ui: {
-                        backgroundColor: 'green'
-                    }
-                })
+                customToaster.add('Login successful', 'ok')
                 onLogin(newToken)
                 authStore.login(newToken, user_id, user_email)
                 navigateTo('/meetings')
@@ -130,15 +121,7 @@ const submitForm = async () => {
         }
     } catch (error: any) {
         globalError.value = true
-        toast.add({
-            title: 'Invalid email or password',
-            color: 'red',
-            icon: "i-heroicons-x-mark",
-            ui: {
-                backgroundColor: "bg-red-100"
-
-            }
-        });
+        customToaster.add('Invalid email or password', 'error')
     }
 }
 </script>
