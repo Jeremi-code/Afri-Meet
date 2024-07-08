@@ -50,36 +50,37 @@ import z from 'zod';
 import { LoginDocument } from '~/gqlGen/types';
 import { _backgroundColor } from '#tailwind-config/theme';
 
-const { onLogin } = useApollo()
-const signinForm = z.object({
-    email: z.string().email(),
-    password: z.string().min(6)
-})
-
 interface Form {
     email: string;
     password: string;
 }
 
+const signinForm = z.object({
+    email: z.string().email(),
+    password: z.string().min(6)
+})
+
 const form = ref<Form>({
     email: '',
     password: ''
 });
-const jwtParser = useJwtParser()
-
-const errors = ref<{ [key: string]: string }>({});
 const formErrorVisible = ref(false)
+const passwordVisible = ref(false);
+const errors = ref<{ [key: string]: string }>({});
+const globalError = ref(false)
+
+const jwtParser = useJwtParser()
+const { onLogin } = useApollo()
+const authStore = useAuthStore()
+const toast = useToast()
+
 const closeError = () => {
     formErrorVisible.value = false
 }
-const passwordVisible = ref(false);
-const globalError = ref(false)
-
 const togglePasswordVisibility = () => {
     passwordVisible.value = !passwordVisible.value;
 };
-const { loading,mutate } = useMutation(LoginDocument)
-const authStore = useAuthStore()
+const { loading, mutate } = useMutation(LoginDocument)
 const validateForm = () => {
     const result = signinForm.safeParse(form.value)
     if (!result.success) {
@@ -92,7 +93,6 @@ const validateForm = () => {
     }
 }
 
-const toast = useToast()
 
 const submitForm = async () => {
     try {
@@ -109,7 +109,7 @@ const submitForm = async () => {
             const user_email = form.value.email
             const parseResult = await jwtParser.parse(newToken)
             if (parseResult) {
-                const {payload} = parseResult
+                const { payload } = parseResult
                 console.log(payload)
                 toast.add({
                     title: 'login successful',
