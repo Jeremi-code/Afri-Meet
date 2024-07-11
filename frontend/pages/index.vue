@@ -3,8 +3,8 @@ import TypeEffect from '~/components/TypeEffect.vue';
 </script>
 
 <template>
-    <div class="flex justify-center mb-30 items-center bg-white h-screen w-full flex-col text-center text-black ">
-        <div class="mb-16 -mt-20">
+    <div class="flex flex-col grow justify-center items-center bg-white text-center text-black ">
+        <div>
             <div class="mb-2">
                 <TypeEffect/>
             </div>
