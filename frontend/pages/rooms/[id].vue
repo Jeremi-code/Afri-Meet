@@ -1,5 +1,4 @@
 <template>
-  <NuxtLayout>
     <div class="max-w-6xl mx-auto py-12 md:py-16 lg:py-20 px-4 md:px-6">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div class="relative rounded-xl overflow-hidden shadow-lg transition-all hover:shadow-2xl">
@@ -77,7 +76,6 @@
         </div>
       </div>
     </div>
-  </NuxtLayout>
 </template>
 
 <script lang="ts" setup>
