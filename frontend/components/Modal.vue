@@ -14,7 +14,6 @@
               @click="isOpen = false" />
           </div>
         </template>
-
         <UForm class="space-y-4" :schema="meetingForm" :state="meeting" @submit="onSubmit" @error="onError">
           <UFormGroup label="Meeting Title" name="title">
             <UInput v-model="meeting.title" id="title" />
@@ -45,15 +44,11 @@
               <template #empty>
                 None Selected
               </template>
-
             </USelectMenu>
           </UFormGroup>
-
-          <!-- Toggle for adding external participants -->
           <UFormGroup label="Add External Participants">
             <UToggle v-model="addExternalParticipants" />
           </UFormGroup>
-
           <UFormGroup v-if="addExternalParticipants" label="External Participant Names">
             <div class="flex flex-wrap gap-2">
               <div v-for="(name, index) in meeting.externalParticipants" :key="index" class="relative">
@@ -158,30 +153,9 @@ const addExternalParticipants = ref(false);
 const loading = ref(false)
 
 const { data: usersData } = useAsyncQuery(GetUsersDocument)
-
-const { data: roomData } = useAsyncQuery(GetRoomsByNameDocument, {
-  name: meeting.value.room
-})
-
 const participants = computed(() => usersData.value?.users)
-const room_id = computed(() => roomData.value?.room[0].room_id)
-const capacity = computed(() => roomData.value?.room[0].capacity)
 const authStore = useAuthStore()
-
-const addMeeting = async () => {
-  const { mutate, loading, error } = useMutation(AddMeetingDocument)
-  const result = await mutate({
-    input: {
-      title: meeting.value.title,
-      room_id: room_id.value,
-      date: meeting.value.date,
-      creator: authStore.user_id,
-      start_time: meeting.value.start_time,
-      end_time: meeting.value.end_time
-    }
-  })
-  return result
-}
+const { mutate: addMeeting } = useMutation(AddMeetingDocument)
 const addParticipant = async (meeting_id: number | undefined, email: string) => {
   const { mutate } = useMutation(AddParticipantDocument)
   const result = await mutate({
@@ -230,12 +204,19 @@ const clearForm = () => {
 }
 const customToaster = useCustomToast()
 const onSubmit = async () => {
+  console.log(meeting.value.room)
   const { result: meetingData, error: newerror, refetch: refetchReservedMeetings } = await useQuery(GetMeetingIdDocument, {
     date: meeting.value.date,
     startTime: meeting.value.start_time,
     endTime: meeting.value.end_time
   })
+  const { result: roomData, refetch } = useQuery(GetRoomsByNameDocument, {
+    name: meeting.value.room
+  })
   const reservedMeetings = computed(() => meetingData.value?.meeting ?? [])
+  await refetch()
+  const capacity = computed(() => roomData.value?.room[0].capacity)
+  const room_id = computed(() => roomData.value?.room[0].room_id)
   await refetchReservedMeetings()
   const currentTime = getCurrentMilitaryTime().split(':')
   const currentDate = formatDate(new Date(), 'yyyy-MM-dd')
@@ -264,6 +245,7 @@ const onSubmit = async () => {
       })
     })
     if (toRaw(reservedRoomList.includes(room_id.value!))) {
+      console.log(reservedRoomList, room_id.value)
       customToaster.add('The Room is reserved at this time', 'error')
       return;
     }
@@ -279,7 +261,16 @@ const onSubmit = async () => {
   }
   try {
     loading.value = true
-    const meetingResult = await addMeeting()
+    const meetingResult = await addMeeting({
+      input: {
+        title: meeting.value.title,
+        room_id: room_id.value,
+        date: meeting.value.date,
+        creator: authStore.user_id,
+        start_time: meeting.value.start_time,
+        end_time: meeting.value.end_time
+      }
+    })
     const meetingID = meetingResult?.data?.meeting?.meeting_id
     const meetings = toRaw(meeting.value.formattedParticipants);
     meetings.forEach(async (meet) => {
