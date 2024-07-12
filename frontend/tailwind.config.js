@@ -10,21 +10,16 @@ export default {
   theme: {
     screens : {
       'sm': '640px',
-      // => @media (min-width: 640px) { ... }
       'msm': {min: '420px', max: '639px'},
+      'lsm':{max:'419px',min:'292px'},
+      'mlsm':{max:'292px'},
       'mism': {max: '785px',min:'640px'},
       'milg': {min: '786px', max: '930px'},
       'md': '768px',
-      // => @media (min-width: 768px) { ... }
       'mlg':'931px',
       'lg': '1024px',
-      // => @media (min-width: 1024px) { ... }
-
       'xl': '1200px',
-      // => @media (min-width: 1280px) { ... }
-
       '2xl': '1300px',
-      // => @media (min-width: 1536px) { ... }
     },
     extend: {},
   },
