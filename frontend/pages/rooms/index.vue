@@ -2,6 +2,7 @@
   <NuxtLayout>
     <section class="w-full py-12 md:py-16 lg:py-20">
       <div class="container px-4 md:px-6">
+        <h1 class="text-3xl font-bold mb-6">Rooms</h1>
         <div class="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           <div v-for="room in roomsList"
             class="group relative rounded-xl overflow-hidden shadow-lg transition-all hover:shadow-2xl"
