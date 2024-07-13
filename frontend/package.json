@@ -39,8 +39,11 @@
     "@nuxt/ui": "^2.13.0",
     "@nuxt3/graphql-codegen-module": "^0.0.7",
     "@nuxtjs/apollo": "^5.0.0-alpha.14",
+    "autoprefixer": "^10.4.19",
     "get-graphql-schema": "^2.1.2",
     "graphql": "^16.8.1",
-    "nuxt-resend": "^0.0.2"
+    "nuxt-resend": "^0.0.2",
+    "postcss": "^8.4.39",
+    "tailwindcss": "^3.4.4"
   }
 }

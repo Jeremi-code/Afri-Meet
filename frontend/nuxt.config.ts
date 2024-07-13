@@ -2,6 +2,7 @@
 import "@nuxt3/graphql-codegen-module";
 export default defineNuxtConfig({
   devtools: { enabled: true },
+  css:['~/assets/main.css'],
   modules: [
     "@nuxtjs/apollo",
     "@nuxt/ui",

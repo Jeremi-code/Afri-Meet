@@ -28,7 +28,7 @@
                             errors.password }}</div>
                     </div>
                     <button type="submit" :disabled="loading"
-                        class="w-full bg-[#84CC16] text-white py-[5px] px-4 rounded-md transition-colors hover:opacity-75 mb-5">
+                        class="w-full bg-[#84CC16] text-white py-[5px] px-4 rounded-md transition-colors hover:opacity-75 mb-5 flex justify-center items-center">
                         <template v-if="loading">
                             <div class="spinner mr-2"></div> Loading...
                         </template>
@@ -36,7 +36,7 @@
                             Sign In
                         </template>
                     </button>
-                    <ULink to="/register" class="mb-5 text-blue-500 underline flex items-center justify-center">
+                    <ULink to="/register" class="mb-4 text-blue-500 underline flex items-center justify-center">
                         Create new account
                     </ULink>
                 </form>
@@ -48,39 +48,38 @@
 <script setup lang="ts">
 import z from 'zod';
 import { LoginDocument } from '~/gqlGen/types';
-import { _backgroundColor } from '#tailwind-config/theme';
-
-const { onLogin } = useApollo()
-const signinForm = z.object({
-    email: z.string().email(),
-    password: z.string().min(6)
-})
 
 interface Form {
     email: string;
     password: string;
 }
 
+const signinForm = z.object({
+    email: z.string().email(),
+    password: z.string().min(6)
+})
+
 const form = ref<Form>({
     email: '',
     password: ''
 });
-const jwtParser = useJwtParser()
-
-const errors = ref<{ [key: string]: string }>({});
 const formErrorVisible = ref(false)
+const passwordVisible = ref(false);
+const errors = ref<{ [key: string]: string }>({});
+const globalError = ref(false)
+
+const jwtParser = useJwtParser()
+const { onLogin } = useApollo()
+const authStore = useAuthStore()
+const customToaster = useCustomToast()
+
 const closeError = () => {
     formErrorVisible.value = false
 }
-const passwordVisible = ref(false);
-const globalError = ref(false)
-
 const togglePasswordVisibility = () => {
     passwordVisible.value = !passwordVisible.value;
 };
-const { loading, error, mutate } = useMutation(LoginDocument)
-const router = useRouter()
-const authStore = useAuthStore()
+const { loading, mutate } = useMutation(LoginDocument)
 const validateForm = () => {
     const result = signinForm.safeParse(form.value)
     if (!result.success) {
@@ -93,7 +92,6 @@ const validateForm = () => {
     }
 }
 
-const toast = useToast()
 
 const submitForm = async () => {
     try {
@@ -110,16 +108,7 @@ const submitForm = async () => {
             const user_email = form.value.email
             const parseResult = await jwtParser.parse(newToken)
             if (parseResult) {
-                const {payload} = parseResult
-                console.log(payload)
-                toast.add({
-                    title: 'login successful',
-                    color: 'green',
-                    icon: 'i-heroicons-check-circle',
-                    ui: {
-                        backgroundColor: 'green'
-                    }
-                })
+                customToaster.add('Login successful', 'ok')
                 onLogin(newToken)
                 authStore.login(newToken, user_id, user_email)
                 navigateTo('/meetings')
@@ -131,15 +120,7 @@ const submitForm = async () => {
         }
     } catch (error: any) {
         globalError.value = true
-        toast.add({
-            title: 'Invalid email or password',
-            color: 'red',
-            icon: "i-heroicons-x-mark",
-            ui: {
-                backgroundColor: "bg-red-100"
-
-            }
-        });
+        customToaster.add('Invalid email or password', 'error')
     }
 }
 </script>
