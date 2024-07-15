@@ -15,7 +15,7 @@
           <BaseNavLink label="About us" to="/about" />
         </li>
 
-        <div v-if="!isAuthenticated" class="flex flex-row px-2 mt-2">
+        <div v-if="!isAuthenticated" class="flex flex-row px-2 items-center">
           <li>
             <UButton class="border-50" to="/register">
               Register
@@ -27,7 +27,7 @@
             </UButton>
           </li>
         </div>
-        <div v-else class="flex flex-row px-2 mt-2">
+        <div v-else class="flex flex-row px-2 ">
           <li>
             <UButton class="text-sm hover:text-gray-900 transition-colors duration-300" to="/login" variant="link"
               @click="handleLogout">
@@ -61,8 +61,7 @@
           <li @click="toggleMobileMenu">
             <BaseNavLink label="About us" to="/about" />
           </li>
-
-          <div v-if="!isAuthenticated" class="flex flex-row space-x-4">
++          <div v-if="!isAuthenticated" class="flex flex-row space-x-4">
             <li class="mt-8">
               <UButton class="border-50" to="/register">
                 Register
