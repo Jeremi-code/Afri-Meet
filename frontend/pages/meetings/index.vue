@@ -22,7 +22,7 @@
       <div class="rounded-lg shadow-md p-4 md:p-6 space-y-4" v-for="createdMeeting in createdMeetingsList">
         <div class="flex items-center justify-between">
           <h2 class="text-xl font-semibold">{{ createdMeeting.title }}</h2>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 lsm:flex-col">
             <RescheduleModal :room="createdMeeting.room" :participants="createdMeeting.participants" :start_time="createdMeeting.start_time" :end_time="createdMeeting.end_time" :date="createdMeeting.date"
               :external_participants="createdMeeting.external_participants" :meeting_id="createdMeeting.meeting_id"
               :title="createdMeeting.title" @update-meeting="refreshPage" />
@@ -33,17 +33,17 @@
             <CancelModal @confirm="deleteMeeting(createdMeeting.meeting_id)" />
           </div>
         </div>
-        <div class="flex items-center justify-between text-sm text-muted-foreground">
-          <p><span class="font-semibold text-md">Date:</span> {{ createdMeeting.date }}</p>
+        <div class="flex items-center justify-between text-sm text-muted-foreground lsm:flex-col lsm:items-baseline lsm:justify-between">
+          <p class="lsm:mb-4"><span class="font-semibold text-md">Date:</span> {{ createdMeeting.date }}</p>
           <p><span class="font-semibold text-md">Time:</span>{{ createdMeeting.start_time }} - {{
             createdMeeting.end_time }}</p>
         </div>
         <p class="text-sm text-muted-foreground"><span class="font-semibold text-md">Room:</span>
           {{ createdMeeting.room.room_name }}</p>
         <p class="text-md font-semibold mb-2">Participants: {{ createdMeeting.participants.length }}</p>
-        <div class="flex items-center gap-2 flex-wrap max-h-20 overflow-hidden">
+        <div class="flex items-center gap-2 flex-wrap max-h-20 overflow-auto">
           <div v-for="participant in createdMeeting.participants" class="flex items-center gap-2">
-            <span class="relative flex size-10 shrink-0 overflow-hidden rounded-full">
+            <span class="relative flex size-10 shrink-0 overflow-auto rounded-full">
               <img class="aspect-square size-full" alt="John Doe" src="../../public/placeholder-user.jpg" />
             </span>
             <span class="text-sm">{{ participant.name }}</span>
@@ -52,10 +52,10 @@
         <div>
           <p class="text-md font-semibold mb-2">External Participants: {{ createdMeeting.external_participants.length
             }}</p>
-          <div class="flex items-center gap-2 flex-wrap max-h-20 overflow-hidden">
+          <div class="flex items-center gap-2 flex-wrap max-h-20 overflow-auto">
             <div v-for="externalParticipant in createdMeeting.external_participants" class="flex items
           -center gap-2">
-              <span class="relative flex size-10 shrink-0 overflow-hidden rounded-full">
+              <span class="relative flex size-10 shrink-0 overflow-auto rounded-full">
                 <img class="aspect-square h-full w-full" alt="Emily Davis" src="../../public/placeholder-user.jpg" />
               </span>
               <span class="text-sm">{{ externalParticipant.name }}</span>
