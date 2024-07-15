@@ -61,7 +61,7 @@
           <li @click="toggleMobileMenu">
             <BaseNavLink label="About us" to="/about" />
           </li>
-+          <div v-if="!isAuthenticated" class="flex flex-row space-x-4">
+          <div v-if="!isAuthenticated" class="flex flex-row space-x-4">
             <li class="mt-8">
               <UButton class="border-50" to="/register">
                 Register
