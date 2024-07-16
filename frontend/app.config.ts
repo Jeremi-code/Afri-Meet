@@ -10,6 +10,10 @@ export default defineAppConfig({
       style : {
         zIndex : 999
       }
+    },
+    modal:{
+      container:'flex min-h-full items-center sm:items-center justify-center text-center',
     }
-  }
+  },
+
 })
