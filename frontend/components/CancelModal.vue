@@ -4,24 +4,25 @@
     Cancel
   </button>
   <UModal v-model="isOpen">
-    <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
-      <template #header>
-        <div class="flex items-center justify-between">
-          <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-            Cancel Meeting
-          </h3>
-          <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
-            @click="isOpen = false" />
+    <div class="p-6">
+      <div class="flex ">
+        <div class=flex-4>
+          <UIcon name="i-heroicons-exclamation-circle" class="text-red-500 dark:text-red-400 mr-4 text-5xl"/>
         </div>
-      </template>
-      <h3 class="text-center">Are you sure?</h3>
-      <template class="flex justify-center px-4 mt-2">
-        <UButton class="px-12 bg-gray-500 text-white hover:bg-gray-600 h-9 rounded-md mx-2" label="Cancel"
-          @click="onCancel" />
-        <UButton class="px-12 bg-red-500 text-white hover:bg-red-600 h-9 rounded-md mx-2" label="Ok"
-          @click="onConfirm" />
-      </template>
-    </UCard>
+        <div class="flex-col">
+          <div>
+            <h3 class="text-lg font-bold">Delete account</h3>
+            <p>Are you sure you want to delete your account?</p>
+          </div>
+          <div class="mt-6 flex justify-start">
+            <UButton class="px-4 bg-gray-500 text-white hover:bg-gray-600 h-9 rounded-md " label="Cancel"
+              @click="onCancel" />
+            <UButton class="px-4 bg-red-500 text-white hover:bg-red-600 h-9 rounded-md mx-2" label="Delete"
+              @click="onConfirm" />
+          </div>
+        </div>
+      </div>
+    </div>
   </UModal>
 </template>
 
@@ -34,12 +35,35 @@ const emit = defineEmits(['confirm', 'cancel']);
 
 const onConfirm = () => {
   emit('confirm');
-  isOpen.value = false
+  isOpen.value = false;
 };
 
 const onCancel = () => {
   emit('cancel');
-  isOpen.value = false
+  isOpen.value = false;
 };
-  </script>
-  
+</script>
+
+
+<!-- <UCard :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
+      <template #header>
+        <div class="flex items-center justify-between">
+          <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+            Cancel Meeting
+          </h3>
+          <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+            @click="isOpen = false" />
+        </div>
+      </template>
+      <div class="text-center my-4">
+        <h3>Are you sure you want to cancel this meeting?</h3>
+      </div>
+      <template #footer>
+        <div class="flex justify-center px-4 mt-2">
+          <UButton class="px-12 bg-gray-500 text-white hover:bg-gray-600 h-9 rounded-md mx-2" label="Cancel"
+            @click="onCancel" />
+          <UButton class="px-12 bg-red-500 text-white hover:bg-red-600 h-9 rounded-md mx-2" label="Ok"
+            @click="onConfirm" />
+        </div>
+      </template>
+    </UCard> -->
