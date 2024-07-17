@@ -4,10 +4,12 @@
     Cancel
   </button>
   <UModal v-model="isOpen">
+    <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="absolute top-1 right-1"
+      @click="isOpen = false" />
     <div class="p-6">
       <div class="flex ">
         <div class=flex-4>
-          <UIcon name="i-heroicons-exclamation-circle" class="text-red-500 dark:text-red-400 mr-4 text-5xl"/>
+          <UIcon name="i-heroicons-exclamation-circle" class="text-red-500 dark:text-red-400 mr-4 text-5xl" />
         </div>
         <div class="flex-col">
           <div>
