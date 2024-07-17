@@ -1,5 +1,4 @@
 import { defineNuxtRouteMiddleware } from "#app";
-import { useRouter } from "vue-router";
 
 
 export default defineNuxtRouteMiddleware ((to,from) => {
