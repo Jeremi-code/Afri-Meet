@@ -64,7 +64,7 @@
         </div>
       </div>
       <div v-for="meeting in joinedMeetingsList" class="bg-white rounded-lg shadow-md p-4 md:p-6 space-y-4">
-        <h2 class="text-xl text-center font-semibold">{{ meeting.title }}</h2>
+        <h2 class="text-xl  font-semibold">{{ meeting.title }}</h2>
         <div class="flex items-center justify-between text-sm text-muted-foreground">
           <p><span class="font-semibold text-md">Date:</span> {{ meeting.date }}</p>
           <p><span class="font-semibold text-md">Time:</span>{{ meeting.start_time }} - {{ meeting.end_time }}</p>
@@ -73,7 +73,7 @@
           meeting.room.room_name }}</p>
         <div class="space-y-2">
           <p class="text-md font-semibold">Participants: {{ meeting.participants.length }}</p>
-          <div class="flex items-center gap-2 flex-wrap max-h-20 overflow-hidden">
+          <div class="flex items-center gap-2 flex-wrap max-h-20 overflow-auto">
             <div v-for="participant in meeting.participants" class="flex items-center gap-2">
               <span class="relative flex size-10 shrink-0 overflow-hidden rounded-full">
                 <img class="aspect-square size-full" alt="John Doe" src="../../public/placeholder-user.jpg" />
