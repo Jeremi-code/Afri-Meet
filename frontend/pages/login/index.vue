@@ -110,7 +110,7 @@ const submitForm = async () => {
             if (parseResult) {
                 customToaster.add('Login successful', 'ok')
                 onLogin(newToken)
-                authStore.login(newToken, user_id, user_email)
+                authStore.login(newToken, user_id, user_email,parseResult.payload.exp!)
                 navigateTo('/meetings')
             }
         }
