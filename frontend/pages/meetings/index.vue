@@ -205,7 +205,6 @@ const joinedMeetingsList = computed<Meeting[]>(() => {
   return meetingData.value?.joinedMeetings.filter((meeting: any) => {
     return !createdMeetingIds.value.includes(meeting.meeting_id)
   }).map((meeting: any) => {
-    console.log(meeting)
     let room = roomsList.value.find((room) => room.room_id === meeting.room_id)
     return ({
       ...meeting,
