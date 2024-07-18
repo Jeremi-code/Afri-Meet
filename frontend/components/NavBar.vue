@@ -52,15 +52,17 @@
           </svg>
         </button>
         <ul class="mt-[160px] space-y-4 flex-grow flex flex-col items-center text-2xl">
-          <li @click="toggleMobileMenu">
-            <BaseNavLink label="Meetings" to="/meetings" />
-          </li>
-          <li @click="toggleMobileMenu">
-            <BaseNavLink label="Rooms" to="/rooms" />
-          </li>
-          <li @click="toggleMobileMenu">
-            <BaseNavLink label="About us" to="/about" />
-          </li>
+          <div class="space-y-4">
+            <li @click="toggleMobileMenu">
+              <BaseNavLink label="Meetings" to="/meetings" />
+            </li>
+            <li @click="toggleMobileMenu">
+              <BaseNavLink label="Rooms" to="/rooms" />
+            </li>
+            <li @click="toggleMobileMenu">
+              <BaseNavLink label="About" to="/about" />
+            </li>
+          </div>
           <div v-if="!isAuthenticated" class="flex flex-row space-x-4">
             <li class="mt-8">
               <UButton class="border-50" to="/register">
