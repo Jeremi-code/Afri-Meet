@@ -54,7 +54,6 @@
           </svg>
         </button>
         <ul class="mt-[160px] space-y-4 flex-grow flex flex-col items-center text-2xl">
-          <div class="space-y-4">
             <li @click="toggleMobileMenu">
               <BaseNavLink label="Meetings" to="/meetings" />
             </li>
@@ -67,7 +66,6 @@
             <li @click="toggleMobileMenu">
               <BaseNavLink label="FAQ" to="/FAQ" />
             </li>
-          </div>
           <div v-if="!isAuthenticated" class="flex flex-row space-x-4">
             <li class="mt-8">
               <UButton class="border-50" to="/register">
@@ -113,7 +111,6 @@ import { storeToRefs } from 'pinia'
 const authStore = useAuthStore()
 const { isAuthenticated } = storeToRefs(authStore)
 
-const activeLink = ref<string>('/')
 const isMobileMenuOpen = ref<boolean>(false)
 
 const handleLogout = () => {
