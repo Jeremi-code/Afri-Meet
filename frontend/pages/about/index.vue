@@ -6,7 +6,10 @@
           <TypeEffect />
           <!-- <h1 class="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">Meeting Scheduler System</h1> -->
           <p class="mt-4 text-lg text-muted-foreground sm:mt-6 sm:text-xl md:mt-8 md:text-2xl">
-            Effortlessly schedule and manage your meetings with our powerful platform.
+            At Afriwork, we are dedicated to enhancing productivity and simplifying workflows. As part of this
+            commitment, we've developed Afrimeet, our internal Meeting Scheduler System, designed to streamline the
+            process of scheduling meetings. Whether coordinating a small team or managing a large department, Afrimeet
+            ensures that meetings are planned efficiently and that all participants are promptly informed.
           </p>
         </div>
       </div>
