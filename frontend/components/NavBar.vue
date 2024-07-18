@@ -12,9 +12,11 @@
           <BaseNavLink label="Rooms" to="/rooms" />
         </li>
         <li class="flex items-center">
-          <BaseNavLink label="About us" to="/about" />
+          <BaseNavLink label="About" to="/about" />
         </li>
-
+        <li class="flex items-center">
+          <BaseNavLink label="FAQ" to="/FAQ" />
+        </li>
         <div v-if="!isAuthenticated" class="flex flex-row px-2 items-center">
           <li>
             <UButton class="border-50" to="/register">
@@ -61,6 +63,9 @@
             </li>
             <li @click="toggleMobileMenu">
               <BaseNavLink label="About" to="/about" />
+            </li>
+            <li @click="toggleMobileMenu">
+              <BaseNavLink label="FAQ" to="/FAQ" />
             </li>
           </div>
           <div v-if="!isAuthenticated" class="flex flex-row space-x-4">
