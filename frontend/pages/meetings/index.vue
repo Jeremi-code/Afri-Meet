@@ -12,10 +12,30 @@
     <div v-else-if="meetingError" class="text-red-500">
       {{ meetingError }}
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"
+    <div class="flex justify-center items-center"
       v-else-if="meetingData?.createdMeetings === undefined || meetingData.joinedMeetings === undefined || (!meetingData?.createdMeetings?.length && !meetingData?.joinedMeetings?.length)">
-      <div class="col-span-full text-center">
-        <p class="text-lg text-muted-foreground">No meetings found</p>
+
+      <div class="bg-background px-4 py-12 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-md text-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="mx-auto h-24 w-24 text-primary">
+            <path d="M8 2v4"></path>
+            <path d="M16 2v4"></path>
+            <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+            <path d="M3 10h18"></path>
+          </svg>
+          <h1 class="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">No meetings found</h1>
+          <p class="mt-4 text-muted-foreground">
+            It looks like there are no meetings to display. Let's create your first meeting by choosing a room.
+          </p>
+          <div class="mt-6">
+            <ULink class="text-white inline-flex items-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              to="/rooms">
+              Choose a room
+            </ULink>
+          </div>
+        </div>
       </div>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" v-else>
