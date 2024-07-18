@@ -42,7 +42,7 @@
         </svg>
       </button>
     </div>
-    <transition name="slide-right">
+    <transition name="slide-right" appear>
       <div v-if="isMobileMenuOpen"
         class="fixed top-0 right-0 mlsm:w-screen w-1/3 msm:w-1/2 lsm:w-2/3 h-screen bg-white flex flex-col z-40 transition-transform duration-300 ease-in-out">
 
@@ -127,10 +127,10 @@ const toggleMobileMenu = () => {
 <style scoped>
 .slide-right-enter-active,
 .slide-right-leave-active {
-  transition: all 0.3s ease;
+  transition: all 0.5s ease-out;
 }
 
-.slide-right-enter,
+.slide-right-enter-from,
 .slide-right-leave-to {
   transform: translateX(100%);
 }
