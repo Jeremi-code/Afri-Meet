@@ -72,6 +72,7 @@
 import z from "zod";
 import { useMutation } from '@vue/apollo-composable';
 import { SignupDocument } from "~/gqlGen/types";
+import { parse } from "date-fns";
 
 interface Form {
   email: string;
@@ -101,8 +102,11 @@ const errors = ref<{ [key: string]: string }>({})
 const passwordVisible = ref(false);
 const confirmPasswordVisible = ref(false)
 
-const storeAuth = useAuthStore()
+const authStore = useAuthStore()
 const customToaster = useCustomToast()
+const jwtParser = useJwtParser()
+const { onLogin } = useApollo()
+
 
 const { mutate, loading } = useMutation(SignupDocument);
 
@@ -151,15 +155,19 @@ const submitForm = async () => {
         const newToken = response?.data?.signup?.token
         const user_id = response?.data?.signup?.user_id
         const user_email = RegisterationForm.value.email
-        storeAuth.login(newToken, user_id as number, user_email)
+        const parseResult = await jwtParser.parse(newToken)
+        if (parseResult) {
+          customToaster.add('Account created successfully', 'ok')
+          onLogin(newToken)
+          authStore.login(newToken, user_id as number, user_email, parseResult.payload.exp!)
+          navigateTo('/meetings')
+          clearForm()
+        }
       }
       else if (response?.errors && response.errors.length > 0) {
         const emailErr = response.errors[0]?.message
         throw new Error(emailErr)
       }
-      clearForm()
-      navigateTo('/meetings')
-      customToaster.add('Account created successfully', 'ok')
     }
 
   } catch (error: any) {
