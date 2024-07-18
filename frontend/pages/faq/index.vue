@@ -8,8 +8,8 @@
                     platform.</p>
             </div>
         </div>
-        <div class="space-y-6 mt-6">
-            <UAccordion open-icon="i-heroicons-plus" close-icon="i-heroicons-minus" :items="items" />
+        <div class="space-y-6 mt-6 max-w-l">
+            <UAccordion open-icon="i-heroicons-plus" close-icon="i-heroicons-minus" :items="items" size="xl"/>
         </div>
     </div>
 </template>
