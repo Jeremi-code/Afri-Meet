@@ -1,10 +1,9 @@
 <template>
   <div class="min-h-screen bg-background text-foreground">
-    <header class="py-8 sm:py-12 md:py-16 lg:py-20">
+    <header>
       <div class="container mx-auto px-4 sm:px-6 md:px-8 lg:px-10">
-        <div class="mx-auto max-w-3xl text-center">
-          <TypeEffect />
-          <!-- <h1 class="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">Meeting Scheduler System</h1> -->
+        <div class="mx-auto max-w-6xl">
+          <h1 class="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">About Us</h1>
           <p class="mt-4 text-lg text-muted-foreground sm:mt-6 sm:text-xl md:mt-8 md:text-2xl">
             At Afriwork, we are dedicated to enhancing productivity and simplifying workflows. As part of this
             commitment, we've developed Afrimeet, our internal Meeting Scheduler System, designed to streamline the
