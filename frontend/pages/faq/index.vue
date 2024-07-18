@@ -16,9 +16,9 @@
 
 <script setup lang="ts">
 const items = [
-    { label: '1. What is Afri Meet?', content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit' },
-    { label: '2. Getting Started', content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit' },
-    { label: '3. Scheduling Meetings', content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit' },
-    { label: '4. Notifiactions', content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit' }
+    { label: '1. What is Afri Meet?', content: 'Afri Meet is the internal tool used at Afriwork to schedule meetings and reserve venues for those meetings.' },
+    { label: '2. How do I get started?', content: 'Register, then Login to your account. Next, start navigating around the Afri Meet platform using the top navigation bar.' },
+    { label: '3. How do I schedule meetings?', content: 'Head over to the rooms page using the top navigation bar, and start by choosing a room suitable for your meeting, click the schedule button to make your meeting one step closer to becoming a reality.' },
+    { label: '4. What are notifiactions?', content: 'Notifications are sent as reminders to meeting participants at a regular interval.' }
 ];
 </script>
