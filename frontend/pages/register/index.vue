@@ -1,6 +1,6 @@
 <template>
-  <div class="bg-[#F5F5F9] w-screen h-screen">
-    <div class="flex mt-8 justify-center text-black">
+  <div class="bg-[#F5F5F9] w-full h-screen">
+    <div class="flex mt-8 justify-center mx-4 text-black">
       <div class=" w-[350px] px-4 rounded-md border border-black border-opacity-15 py-4 shadow-sm bg-white">
         <h1 class="text-2xl font-bold mb-4 text-center text-black">Sign Up</h1>
         <form @submit.prevent="submitForm">

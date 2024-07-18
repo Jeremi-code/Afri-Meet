@@ -1,6 +1,6 @@
 <template>
     <div class="bg-[#F5F5F9] w-screen text-black">
-        <div class="flex items-center justify-center h-screen -mt-8">
+        <div class="flex items-center mx-4 justify-center h-screen -mt-8">
             <div
                 class="max-w-md w-[350px] px-6 rounded-md border border-black border-opacity-15 py-8 shadow-sm bg-white">
                 <h1 class="text-3xl text-black font-bold mb-6 text-center">Sign In</h1>
@@ -110,7 +110,7 @@ const submitForm = async () => {
             if (parseResult) {
                 customToaster.add('Login successful', 'ok')
                 onLogin(newToken)
-                authStore.login(newToken, user_id, user_email,parseResult.payload.exp!)
+                authStore.login(newToken, user_id, user_email, parseResult.payload.exp!)
                 navigateTo('/meetings')
             }
         }
