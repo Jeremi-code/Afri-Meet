@@ -2,9 +2,9 @@ import { defineNuxtRouteMiddleware } from "#app";
 
 
 export default defineNuxtRouteMiddleware ((to,from) => {
-    const store = useAuthStore()
-    console.log(store.isAuthenticated)
-    if(!store.isAuthenticated) {
-        navigateTo('/login')
+    const authStore = useAuthStore();
+    const { isAuthenticated } = storeToRefs(authStore);
+    if(!isAuthenticated.value) {
+        return navigateTo('/login')
     }
 });
