@@ -23,7 +23,8 @@
         <div class="flex items-center justify-between">
           <h2 class="text-xl font-semibold">{{ createdMeeting.title }}</h2>
           <div class="flex items-center gap-2 lsm:flex-col">
-            <RescheduleModal :room="createdMeeting.room" :participants="createdMeeting.participants" :start_time="createdMeeting.start_time" :end_time="createdMeeting.end_time" :date="createdMeeting.date"
+            <RescheduleModal :room="createdMeeting.room" :participants="createdMeeting.participants"
+              :start_time="createdMeeting.start_time" :end_time="createdMeeting.end_time" :date="createdMeeting.date"
               :external_participants="createdMeeting.external_participants" :meeting_id="createdMeeting.meeting_id"
               :title="createdMeeting.title" @update-meeting="refreshPage" />
             <!-- <button @click="deleteMeeting(createdMeeting.meeting_id)"
@@ -33,7 +34,8 @@
             <CancelModal @confirm="deleteMeeting(createdMeeting.meeting_id)" />
           </div>
         </div>
-        <div class="flex items-center justify-between text-sm text-muted-foreground lsm:flex-col lsm:items-baseline lsm:justify-between">
+        <div
+          class="flex items-center justify-between text-sm text-muted-foreground lsm:flex-col lsm:items-baseline lsm:justify-between">
           <p class="lsm:mb-4"><span class="font-semibold text-md">Date:</span> {{ createdMeeting.date }}</p>
           <p><span class="font-semibold text-md">Time:</span>{{ createdMeeting.start_time }} - {{
             createdMeeting.end_time }}</p>
@@ -82,7 +84,7 @@
             </div>
           </div>
         </div>
-        <div class="">
+        <div>
           <p class="text-md font-semibold mb-2">External Participants: {{ meeting.external_participants.length }}</p>
           <div class="flex items-center gap-2 flex-wrap max-h-20 overflow-hidden">
             <div v-for="externalParticipant in meeting.external_participants" class="flex items-center gap-2">
@@ -187,7 +189,7 @@ const createdMeetingsList = computed<Meeting[]>(() => {
     return ({
       ...meeting,
       room,
-      date: meeting.date as string,  
+      date: meeting.date as string,
       participants: meeting.participants.map((participant: any) => {
         let participantUser = usersList.value.find((user) => user.email === participant.email)
         return {
