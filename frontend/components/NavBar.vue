@@ -120,10 +120,6 @@ const handleLogout = () => {
   authStore.logout()
 }
 
-const setActiveLink = (route: string) => {
-  activeLink.value = route
-}
-
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
 }
