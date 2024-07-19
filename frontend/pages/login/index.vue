@@ -1,6 +1,6 @@
 <template>
     <div class="bg-[#F5F5F9] w-screen text-black">
-        <div class="flex items-center mx-4 justify-center h-screen -mt-8">
+        <div class="flex items-center mx-4 justify-center min-h-screen -mt-8">
             <div
                 class="max-w-md w-[350px] px-6 rounded-md border border-black border-opacity-15 py-8 shadow-sm bg-white">
                 <h1 class="text-3xl text-black font-bold mb-6 text-center">Sign In</h1>
@@ -48,6 +48,10 @@
 <script setup lang="ts">
 import z from 'zod';
 import { LoginDocument } from '~/gqlGen/types';
+
+definePageMeta({
+    middleware :'auth'
+})
 
 interface Form {
     email: string;
