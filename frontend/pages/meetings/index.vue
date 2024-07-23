@@ -47,10 +47,6 @@
               :start_time="createdMeeting.start_time" :end_time="createdMeeting.end_time" :date="createdMeeting.date"
               :external_participants="createdMeeting.external_participants" :meeting_id="createdMeeting.meeting_id"
               :title="createdMeeting.title" @update-meeting="refreshPage" />
-            <!-- <button @click="deleteMeeting(createdMeeting.meeting_id)"
-              class="bg-red-500 text-white hover:bg-red-600 inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-9 rounded-md px-3">
-              Cancel
-            </button> -->
             <CancelModal @confirm="deleteMeeting(createdMeeting.meeting_id)" />
           </div>
         </div>
@@ -122,7 +118,6 @@
 </template>
 <script setup lang="ts">
 import { formatDate } from 'date-fns';
-import RescheduleModal from '~/components/RescheduleModal.vue';
 import { DeleteMeetingDocument, GetMeetingsForUserDocument, GetRoomsDocument, GetUsersDocument } from '~/gqlGen/types';
 
 definePageMeta({
